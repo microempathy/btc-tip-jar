@@ -10,7 +10,7 @@
  * */
 
 class Btc_Tip_Jar {
-	private $settings;
+	private $menu;
 	private $btc;
 
 	public function __construct() {
@@ -26,17 +26,19 @@ class Btc_Tip_Jar {
 			),
 		);
 
-		$this->settings = get_option( get_class(), $defaults );
+		// admin menu functionality
+		require_once( 'inc/btc-tip-jar-menu.php' );
+		$this->menu = new Btc_Tip_Jar_Menu( $defaults );
 
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
 		$this->btc = new Btc_Tip_Jar_Btc(
-			$this->settings['connection']['rpcconnect'],
-			$this->settings['connection']['rpcssl'],
-			$this->settings['connection']['rpcport'],
-			$this->settings['connection']['rpcuser'],
-			$this->settings['connection']['rpcpassword'],
-			$this->settings['connection']['rpcwallet']
+			$this->menu->settings['connection']['rpcconnect'],
+			$this->menu->settings['connection']['rpcssl'],
+			$this->menu->settings['connection']['rpcport'],
+			$this->menu->settings['connection']['rpcuser'],
+			$this->menu->settings['connection']['rpcpassword'],
+			$this->menu->settings['connection']['rpcwallet']
 		);
 
 	}
