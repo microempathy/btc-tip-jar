@@ -1,0 +1,3 @@
+[submodule "lib/json-rpc-php"]
+	path = lib/json-rpc-php
+	url = git@github.com:thinkphp/json-rpc-php.git

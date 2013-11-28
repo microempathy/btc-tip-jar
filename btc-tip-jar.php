@@ -10,5 +10,35 @@
  * */
 
 class Btc_Tip_Jar {
+	private $settings;
+	private $btc;
+
+	public function __construct() {
+
+		$defaults = array(
+			'connection' => array(
+				'rpcconnect'  => 'rpc.blockchain.info',
+				'rpcssl'      => false,
+				'rpcport'     => 80,
+				'rpcuser'     => null,
+				'rpcpassword' => null,
+				'rpcwallet'   => null,
+			),
+		);
+
+		$this->settings = get_option( get_class(), $defaults );
+
+		// bitcoin functionality
+		require_once( 'inc/btc-tip-jar-btc.php' );
+		$this->btc = new Btc_Tip_Jar_Btc(
+			$this->settings['connection']['rpcconnect'],
+			$this->settings['connection']['rpcssl'],
+			$this->settings['connection']['rpcport'],
+			$this->settings['connection']['rpcuser'],
+			$this->settings['connection']['rpcpassword'],
+			$this->settings['connection']['rpcwallet']
+		);
+
+	}
 }
 $btc_tip_jar = new Btc_Tip_Jar();
