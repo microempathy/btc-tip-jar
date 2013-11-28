@@ -54,13 +54,11 @@ class Btc_Tip_Jar_Btc {
 		$connect_string .= "{$this->rpcuser}:{$this->rpcpassword}@";
 		$connect_string .= "{$this->rpcconnect}:{$this->rpcport}";
 
-		error_log( $connect_string );
-
 		try {
-		$this->connection = new jsonRPCClient( $connect_string, true );
-		$this->connection->getInfo();
+			$this->connection = new jsonRPCClient( $connect_string, true );
+			$this->connection->getinfo();
 
-		return true;
+			return true;
 		} catch( Exception $e ) {
 			error_log( $e->getMessage() );
 			return false;

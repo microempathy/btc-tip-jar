@@ -16,14 +16,12 @@ class Btc_Tip_Jar {
 	public function __construct() {
 
 		$defaults = array(
-			'connection' => array(
-				'rpcconnect'  => 'rpc.blockchain.info',
-				'rpcssl'      => false,
-				'rpcport'     => 80,
-				'rpcuser'     => null,
-				'rpcpassword' => null,
-				'rpcwallet'   => null,
-			),
+			'rpcconnect'  => 'rpc.blockchain.info',
+			'rpcssl'      => true,
+			'rpcport'     => 443,
+			'rpcuser'     => null,
+			'rpcpassword' => null,
+			'rpcwallet'   => null,
 		);
 
 		// admin menu functionality
@@ -33,12 +31,12 @@ class Btc_Tip_Jar {
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
 		$this->btc = new Btc_Tip_Jar_Btc(
-			$this->menu->settings['connection']['rpcconnect'],
-			$this->menu->settings['connection']['rpcssl'],
-			$this->menu->settings['connection']['rpcport'],
-			$this->menu->settings['connection']['rpcuser'],
-			$this->menu->settings['connection']['rpcpassword'],
-			$this->menu->settings['connection']['rpcwallet']
+			$this->menu->settings['rpcconnect'],
+			$this->menu->settings['rpcssl'],
+			$this->menu->settings['rpcport'],
+			$this->menu->settings['rpcuser'],
+			$this->menu->settings['rpcpassword'],
+			$this->menu->settings['rpcwallet']
 		);
 
 	}
