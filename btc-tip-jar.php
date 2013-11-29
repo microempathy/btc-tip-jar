@@ -17,11 +17,15 @@ class Btc_Tip_Jar {
 
 	public function __construct() {
 
+		global $wpdb;
+		$class = get_class();
 		$settings_defaults = array(
 			'rpctimeout'  => 2,
 			'lastblock'   => null,
+			'addresses_table' => "{$wpdb->base_prefix}{$class}_addresses",
 		);
 		$this->settings = get_option( get_class(), $settings_defaults );
+		update_option( get_class(), $this->settings );
 
 		// admin menu functionality
 		$menu_defaults = array(
@@ -57,22 +61,19 @@ class Btc_Tip_Jar {
 	public function create_addresses_table() {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-		global $wpdb;
-
-		$class = get_class();
-
-		$address_table = <<<SQL
-CREATE TABLE {$wpdb->base_prefix}{$class}_addresses (
+		$addresses_table_sql = <<<SQL
+CREATE TABLE {$this->settings['addresses_table']} (
 	id        mediumint(9) NOT NULL AUTO_INCREMENT,
 	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
 	author_id mediumint(9) NOT NULL,
-	user_id   mediumint(9) NOT NULL,
 	post_id   mediumint(9) NOT NULL,
+	user_id   mediumint(9) NOT NULL,
+	address   VARCHAR(64)  NOT NULL,
 	UNIQUE KEY (id)
 );
 SQL;
 
-		dbDelta( $address_table );
+		dbDelta( $addresses_table_sql );
 	}
 	public function do_scripts_and_styles() {
 

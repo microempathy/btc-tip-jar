@@ -83,11 +83,46 @@ class Btc_Tip_Jar_Btc {
 			return $user_address;
 		}
 	}
-	public function get_post_address_user( $post_id, $author, $user ) {
+	public function get_post_address_user( $post_id, $author_id, $user_id ) {
 
-		$author_address = $this->get_user_address( $author );
-		$user_address   = $this->get_user_address( $user );
+		$author_account = $this->get_user_address( $author_id );
+		global $wpdb;
+		$settings = get_option( 'Btc_Tip_Jar' );
 
+		$sql = <<<SQL
+SELECT
+	address
+	FROM {$settings['addresses_table']}
+	WHERE post_id   = {$post_id}
+	  AND author_id = {$author_id}
+	  AND user_id   = {$user_id}
+	LIMIT 1;
+SQL;
+
+		$address = $wpdb->get_results( $sql );
+
+		if ( !empty( $address[0]->address ) ) {
+			return $address->address;
+		} else {
+			$btc = $this->connect();
+			try {
+				$getnewaddress = $btc->getnewaddress( $author_account['label'] );
+				$wpdb->insert(
+					$settings['addresses_table'],
+					array(
+						'author_id' => $author_id,
+						'post_id'   => $post_id,
+						'user_id'   => $user_id,
+						'address'   => $getnewaddress,
+					)
+				);
+
+				return $getnewaddress;
+			} catch( Exception $e ) {
+				error_log( $e->getMessage() );
+				return false;
+			}
+		}
 	}
 	public function get_post_address_anonymous( $post_id, $author ) {
 
