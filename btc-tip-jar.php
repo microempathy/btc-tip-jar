@@ -89,16 +89,14 @@ class Btc_Tip_Jar {
 		get_currentuserinfo();
 
 		if ( is_user_logged_in() ) {
-			$address = $this->btc->get_post_address_user( $post->ID, $post->post_author, $current_user->ID );
+			$qr_url = $this->get_qr_url( $post->post_name, $post->ID, $post->post_author, $current_user->ID );
 		} else {
-			$address = $this->btc->get_post_address_anonymous( $post->ID, $post->post_author );
+			$qr_url = $this->get_qr_url( $post->post_name, $post->ID, $post->post_author, false );
 		}
 
 		$total_donated = 0.0;
 
 		$label = "Bitcoins Donated: {$total_donated}";
-
-		$qr_url = $this->get_qr_url( $address, 'donation-' . $post->post_name );
 
 		if ( is_user_logged_in() ) {
 			$logout = wp_logout_url( get_permalink() );
@@ -108,7 +106,7 @@ class Btc_Tip_Jar {
 		} else {
 			$login = wp_login_url( get_permalink() );
 
-			$before = 'Donating anonymously';
+			$before = 'Donating anonymously...';
 			$after  = "<a href=\"{$login}\">Log in</a> first to take credit!";
 		}
 
@@ -127,15 +125,21 @@ HTML;
 
 		return $content;
 	}
-	public function get_qr_url( $address, $label ) {
+	public function get_qr_url( $label, $post_id, $author_id, $user_id ) {
 		require_once( 'lib/phpqrcode/qrlib.php' );
 
-		$filename = 'btc-tip-jar-' . md5( $address . $label ) . '.png';
+		if ( $user_id ) {
+			$address = $this->btc->get_post_address_user( $post_id, $author_id, $user_id );
+		} else {
+			$address = $this->btc->get_post_address_anonymous( $post_id, $author_id );
+		}
+
+		$filename = 'btc-tip-jar-' . $address . '.png';
 		$path_url = plugins_url( '/lib/phpqrcode/cache/codes/', __FILE__ );
 		$path     = plugin_dir_path( __FILE__ ) . 'lib/phpqrcode/cache/codes/';
 
 		if ( !file_exists( $path . $filename ) ) {
-			QRcode::png( "bitcoin:{$address}?label={$label}", $path . $filename, QR_ECLEVEL_H );
+			QRcode::png( "bitcoin:{$address}?label=donation-to-{$label}", $path . $filename, QR_ECLEVEL_H );
 		}
 
 		return $path_url . $filename;
