@@ -11,13 +11,13 @@ class Btc_Tip_Jar_Btc {
 	private $connect_string;
 
 	public function __construct(
-		$rpcconnect  = 'rpc.blockchain.info',
-		$rpcssl      = false,
-		$rpcport     = 80,
-		$rpcuser     = null,
-		$rpcpassword = null,
-		$rpcwallet   = null,
-		$rpctimeout  = 5.0
+		$rpcconnect,
+		$rpcssl,
+		$rpcport,
+		$rpcuser,
+		$rpcpassword,
+		$rpcwallet,
+		$rpctimeout
 	) {
 		$this->rpcconnect  = $rpcconnect;
 		$this->rpcssl      = $rpcssl;
@@ -51,8 +51,6 @@ class Btc_Tip_Jar_Btc {
 			return false;
 		}
 
-		error_log( $this->connect_string );
-
 		try {
 			$connection = new jsonRPCClient( $this->connect_string, false );
 			$connection->walletpassphrase( $this->rpcwallet, intval( $this->rpctimeout ) );
@@ -85,7 +83,12 @@ class Btc_Tip_Jar_Btc {
 			return $author_account;
 		}
 	}
-	public function get_post_address_anonymous( $author, $post_id ) {
+	public function get_post_address_user( $post_id, $author, $user ) {
+
+		$author_account = $this->get_author_account( $author );
+
+	}
+	public function get_post_address_anonymous( $post_id, $author ) {
 
 		$author_account = $this->get_author_account( $author );
 

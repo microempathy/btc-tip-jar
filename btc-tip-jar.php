@@ -7,27 +7,34 @@
  * Author:      @wikitopian
  * Author URI:  http://www.swarmstrategies.com/matt
  * License:     LGPLv3
- * */
+ */
 
 class Btc_Tip_Jar {
 	private $menu;
 	private $btc;
 
+	private $settings;
+
 	public function __construct() {
 
-		$defaults = array(
+		$settings_defaults = array(
+			'rpctimeout'  => 2,
+			'lastblock'   => null,
+		);
+		$this->settings = get_option( get_class(), $settings_defaults );
+
+		// admin menu functionality
+		$menu_defaults = array(
 			'rpcconnect'  => 'rpc.blockchain.info',
 			'rpcssl'      => true,
 			'rpcport'     => 443,
 			'rpcuser'     => null,
 			'rpcpassword' => null,
 			'rpcwallet'   => null,
-			'rpctimeout'  => 5.0,
 		);
 
-		// admin menu functionality
 		require_once( 'inc/btc-tip-jar-menu.php' );
-		$this->menu = new Btc_Tip_Jar_Menu( $defaults );
+		$this->menu = new Btc_Tip_Jar_Menu( $menu_defaults );
 
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
@@ -38,7 +45,7 @@ class Btc_Tip_Jar {
 			$this->menu->settings['rpcuser'],
 			$this->menu->settings['rpcpassword'],
 			$this->menu->settings['rpcwallet'],
-			$this->menu->settings['rpctimeout']
+			$this->settings['rpctimeout']
 		);
 
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_scripts_and_styles' ) );
@@ -78,12 +85,13 @@ class Btc_Tip_Jar {
 		}
 
 		global $post;
+		global $current_user;
+		get_currentuserinfo();
 
-		if ( !is_user_logged_in() ) {
-			$address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+		if ( is_user_logged_in() ) {
+			$address = $this->btc->get_post_address_user( $post->ID, $post->post_author, $current_user->ID );
 		} else {
-			// replace with more complex options
-			$address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+			$address = $this->btc->get_post_address_anonymous( $post->ID, $post->post_author );
 		}
 
 		$total_donated = 0.0;
@@ -93,9 +101,6 @@ class Btc_Tip_Jar {
 		$qr_url = $this->get_qr_url( $address, 'donation-' . $post->post_name );
 
 		if ( is_user_logged_in() ) {
-			global $current_user;
-			get_currentuserinfo();
-
 			$logout = wp_logout_url( get_permalink() );
 
 			$before = "Donating as {$current_user->display_name}...";
