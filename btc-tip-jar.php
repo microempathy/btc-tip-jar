@@ -41,9 +41,37 @@ class Btc_Tip_Jar {
 			$this->menu->settings['rpctimeout']
 		);
 
-		add_filter( 'the_content', array( &$this, 'add_qr_code' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'do_scripts_and_styles' ) );
+
+		add_filter( 'the_content', array( &$this, 'add_post_tip_jar' ) );
 	}
-	public function add_qr_code( $content = '' ) {
+	public function do_scripts_and_styles() {
+
+		global $wp_scripts;
+		$jquery   = $wp_scripts->query( 'jquery-ui-core' );
+		$protocol = is_ssl() ? 'https' : 'http';
+		$url = "$protocol://ajax.googleapis.com/ajax/libs/jqueryui/{$jquery->ver}/themes/smoothness/jquery-ui.min.css";
+		wp_enqueue_style( 'jquery-ui-smoothness', $url, false, null );
+
+		wp_enqueue_style(
+			get_class(),
+			plugins_url( '/styles/btc-tip-jar.css', __FILE__ )
+		);
+
+		wp_enqueue_script(
+			get_class(),
+			plugins_url( '/scripts/btc-tip-jar.js', __FILE__ ),
+			array(
+				'jquery',
+				'jquery-ui-core',
+				'jquery-ui-button',
+				'jquery-ui-dialog',
+			),
+			false,
+			true
+		);
+	}
+	public function add_post_tip_jar( $content = '' ) {
 
 		if ( !is_single() ) {
 			return $content;
@@ -51,9 +79,25 @@ class Btc_Tip_Jar {
 
 		global $post;
 
-		$anonymous_address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+		if ( !is_user_logged_in() ) {
+			$address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+		} else {
+			// replace with more complex options
+			$address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+		}
 
-		$content .= 'QR Code: ' . $anonymous_address;
+		$total_donated = 0.0;
+
+		$label = "Bitcoins Donated: {$total_donated}";
+
+		$tip_jar = <<<HTML
+<input type="button" id="Btc_Tip_Jar_tip_jar" name="Btc_Tip_Jar_tip_jar" value="{$label}" />
+<div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
+		{$address}
+</div>
+HTML;
+
+		$content .= "<br />\n" . $tip_jar;
 
 		return $content;
 	}
