@@ -22,6 +22,7 @@ class Btc_Tip_Jar {
 			'rpcuser'     => null,
 			'rpcpassword' => null,
 			'rpcwallet'   => null,
+			'rpctimeout'  => 5.0,
 		);
 
 		// admin menu functionality
@@ -36,9 +37,25 @@ class Btc_Tip_Jar {
 			$this->menu->settings['rpcport'],
 			$this->menu->settings['rpcuser'],
 			$this->menu->settings['rpcpassword'],
-			$this->menu->settings['rpcwallet']
+			$this->menu->settings['rpcwallet'],
+			$this->menu->settings['rpctimeout']
 		);
 
+		add_filter( 'the_content', array( &$this, 'add_qr_code' ) );
+	}
+	public function add_qr_code( $content = '' ) {
+
+		if ( !is_single() ) {
+			return $content;
+		}
+
+		global $post;
+
+		$anonymous_address = $this->btc->get_post_address_anonymous( $post->post_author, $post->ID );
+
+		$content .= 'QR Code: ' . $anonymous_address;
+
+		return $content;
 	}
 }
 $btc_tip_jar = new Btc_Tip_Jar();

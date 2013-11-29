@@ -40,6 +40,7 @@ public function menu() {
 		$this->menu_page_item( 'rpcuser', __( 'Username' ) );
 		$this->menu_page_item( 'rpcpassword', __( 'Password' ) );
 		$this->menu_page_item( 'rpcwallet', __( 'Wallet Password' ) );
+		$this->menu_page_item( 'rpctimeout', __( 'Wallet Timeout' ) );
 
 		echo '</table>';
 		submit_button();

@@ -8,8 +8,7 @@ class Btc_Tip_Jar_Btc {
 	private $rpcpassword;
 	private $rpcwallet;
 
-	private $connection;
-	private $connected = false;
+	private $connect_string;
 
 	public function __construct(
 		$rpcconnect  = 'rpc.blockchain.info',
@@ -17,7 +16,8 @@ class Btc_Tip_Jar_Btc {
 		$rpcport     = 80,
 		$rpcuser     = null,
 		$rpcpassword = null,
-		$rpcwallet   = null
+		$rpcwallet   = null,
+		$rpctimeout  = 5.0
 	) {
 		$this->rpcconnect  = $rpcconnect;
 		$this->rpcssl      = $rpcssl;
@@ -25,10 +25,17 @@ class Btc_Tip_Jar_Btc {
 		$this->rpcuser     = $rpcuser;
 		$this->rpcpassword = $rpcpassword;
 		$this->rpcwallet   = $rpcwallet;
+		$this->rpctimeout  = $rpctimeout;
 
-		if ( $this->connect() ) {
-			$this->connected = true;
+		if ( $this->rpcssl ) {
+			$schema = 'https';
+		} else {
+			$schema = 'http';
 		}
+
+		$this->connect_string  = "{$schema}://";
+		$this->connect_string .= "{$this->rpcuser}:{$this->rpcpassword}@";
+		$this->connect_string .= "{$this->rpcconnect}:{$this->rpcport}";
 
 	}
 	public function connect() {
@@ -44,26 +51,57 @@ class Btc_Tip_Jar_Btc {
 			return false;
 		}
 
-		if ( $this->rpcssl ) {
-			$schema = 'https';
-		} else {
-			$schema = 'http';
-		}
-
-		$connect_string  = "{$schema}://";
-		$connect_string .= "{$this->rpcuser}:{$this->rpcpassword}@";
-		$connect_string .= "{$this->rpcconnect}:{$this->rpcport}";
+		error_log( $this->connect_string );
 
 		try {
-			$this->connection = new jsonRPCClient( $connect_string, true );
-			$this->connection->getinfo();
+			$connection = new jsonRPCClient( $this->connect_string, true );
+			$connection->walletpassphrase( $this->rpcwallet, intval( $this->rpctimeout ) );
 
-			return true;
+			return $connection;
 		} catch( Exception $e ) {
 			error_log( $e->getMessage() );
 			return false;
 		}
 
+	}
+	public function get_author_account( $author ) {
+
+		$label  = home_url( '/' );
+		$label .= get_class() . '/' . $author;
+
+		$author_account = get_user_meta( $author, '_' . get_class() . '_account', true );
+		if ( empty( $author_account ) ) {
+			$btc = $this->connect();
+			try {
+				$getaccountaddress = $btc->getaccountaddress( $label );
+				$author_account = array();
+				$author_account['label']   = $label;
+				$author_account['address'] = $getaccountaddress;
+				update_user_meta( $author, '_' . get_class() . '_account', $author_account );
+			} catch( Exception $e ) {
+				error_log( $e->getMessage() );
+			}
+		} else {
+			return $author_account;
+		}
+	}
+	public function get_post_address_anonymous( $author, $post_id ) {
+
+		$author_account = $this->get_author_account( $author );
+
+		$anonymous_address = get_post_meta( $post_id, '_' . get_class() . '_anonymous', true );
+		if ( empty( $anonymous_address ) ) {
+			$btc = $this->connect();
+			try {
+				$getnewaddress = $btc->getnewaddress( $author_account['label'] );
+			} catch( Exception $e ) {
+				error_log( $e->getMessage() );
+			}
+			$anonymous_address = $getnewaddress;
+			update_post_meta( $post_id, '_' . get_class() . '_anonymous', $anonymous_address );
+		}
+
+		return $anonymous_address;
 	}
 }
 
