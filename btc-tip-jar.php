@@ -48,9 +48,31 @@ class Btc_Tip_Jar {
 			$this->settings['rpctimeout']
 		);
 
+		register_activation_hook( __FILE__, array( &$this, 'create_addresses_table' ) );
+
 		add_action( 'wp_enqueue_scripts', array( &$this, 'do_scripts_and_styles' ) );
 
 		add_filter( 'the_content', array( &$this, 'add_post_tip_jar' ) );
+	}
+	public function create_addresses_table() {
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+		global $wpdb;
+
+		$class = get_class();
+
+		$address_table = <<<SQL
+CREATE TABLE {$wpdb->base_prefix}{$class}_addresses (
+	id        mediumint(9) NOT NULL AUTO_INCREMENT,
+	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+	author_id mediumint(9) NOT NULL,
+	user_id   mediumint(9) NOT NULL,
+	post_id   mediumint(9) NOT NULL,
+	UNIQUE KEY (id)
+);
+SQL;
+
+		dbDelta( $address_table );
 	}
 	public function do_scripts_and_styles() {
 

@@ -62,35 +62,36 @@ class Btc_Tip_Jar_Btc {
 		}
 
 	}
-	public function get_author_account( $author ) {
+	public function get_user_address( $user ) {
 
 		$label  = home_url( '/' );
-		$label .= get_class() . '/' . $author;
+		$label .= get_class() . '/' . $user;
 
-		$author_account = get_user_meta( $author, '_' . get_class() . '_account', true );
-		if ( empty( $author_account ) ) {
+		$user_address = get_user_meta( $user, '_' . get_class() . '_account', true );
+		if ( empty( $user_address ) ) {
 			$btc = $this->connect();
 			try {
 				$getaccountaddress = $btc->getaccountaddress( $label );
-				$author_account = array();
-				$author_account['label']   = $label;
-				$author_account['address'] = $getaccountaddress;
-				update_user_meta( $author, '_' . get_class() . '_account', $author_account );
+				$user_address = array();
+				$user_address['label']   = $label;
+				$user_address['address'] = $getaccountaddress;
+				update_user_meta( $user, '_' . get_class() . '_account', $user_address );
 			} catch( Exception $e ) {
 				error_log( $e->getMessage() );
 			}
 		} else {
-			return $author_account;
+			return $user_address;
 		}
 	}
 	public function get_post_address_user( $post_id, $author, $user ) {
 
-		$author_account = $this->get_author_account( $author );
+		$author_address = $this->get_user_address( $author );
+		$user_address   = $this->get_user_address( $user );
 
 	}
 	public function get_post_address_anonymous( $post_id, $author ) {
 
-		$author_account = $this->get_author_account( $author );
+		$author_account = $this->get_user_address( $author );
 
 		$anonymous_address = get_post_meta( $post_id, '_' . get_class() . '_anonymous', true );
 		if ( empty( $anonymous_address ) ) {
