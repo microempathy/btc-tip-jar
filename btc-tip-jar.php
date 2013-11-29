@@ -37,7 +37,9 @@ class Btc_Tip_Jar {
 			'rpcwallet'   => null,
 		);
 
-		$this->settings_menu = get_option( get_class() . '_Menu', $settings_menu );
+		$this->settings_menu = get_option(
+			get_class() . '_Menu', $settings_menu
+		);
 
 		// user interface
 		require_once( 'inc/btc-tip-jar-menu.php' );
@@ -45,17 +47,30 @@ class Btc_Tip_Jar {
 
 		// database functionality
 		require_once( 'inc/btc-tip-jar-database.php' );
-		$this->database = new Btc_Tip_Jar_Database( $this->settings, $this->settings_menu );
+		$this->database = new Btc_Tip_Jar_Database(
+			$this->settings, $this->settings_menu
+		);
 
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
-		$this->btc = new Btc_Tip_Jar_Btc( $this->settings, $this->settings_menu, $this->database );
+		$this->btc = new Btc_Tip_Jar_Btc(
+			$this->settings, $this->settings_menu, $this->database
+		);
 
-		register_activation_hook( __FILE__, array( &$this->database, 'create_tx_history_table' ) );
+		register_activation_hook(
+			__FILE__,
+			array( &$this->database, 'create_tx_history_table' )
+		);
 
-		register_activation_hook( __FILE__, array( &$this->database, 'create_addresses_table' ) );
+		register_activation_hook(
+			__FILE__,
+			array( &$this->database, 'create_addresses_table' )
+		);
 
-		add_action( 'wp_enqueue_scripts', array( &$this, 'do_scripts_and_styles' ) );
+		add_action(
+			'wp_enqueue_scripts',
+			array( &$this, 'do_scripts_and_styles' )
+		);
 
 		add_filter( 'the_content', array( &$this, 'add_post_tip_jar' ) );
 	}
@@ -64,7 +79,10 @@ class Btc_Tip_Jar {
 		global $wp_scripts;
 		$jquery   = $wp_scripts->query( 'jquery-ui-core' );
 		$protocol = is_ssl() ? 'https' : 'http';
-		$url = "$protocol://ajax.googleapis.com/ajax/libs/jqueryui/{$jquery->ver}/themes/smoothness/jquery-ui.min.css";
+
+		$url  = "$protocol://ajax.googleapis.com/ajax/libs/jqueryui/";
+		$url .= "{$jquery->ver}/themes/smoothness/jquery-ui.min.css";
+
 		wp_enqueue_style( 'jquery-ui-smoothness', $url, false, null );
 
 		wp_enqueue_style(
@@ -96,9 +114,19 @@ class Btc_Tip_Jar {
 		get_currentuserinfo();
 
 		if ( is_user_logged_in() ) {
-			$qr_url = $this->get_qr_url( $post->post_name, $post->ID, $post->post_author, $current_user->ID );
+			$qr_url = $this->get_qr_url(
+				$post->post_name,
+				$post->ID,
+				$post->post_author,
+				$current_user->ID
+			);
 		} else {
-			$qr_url = $this->get_qr_url( $post->post_name, $post->ID, $post->post_author, false );
+			$qr_url = $this->get_qr_url(
+				$post->post_name,
+				$post->ID,
+				$post->post_author,
+				false
+			);
 		}
 
 		$total_donated = 0.0;
@@ -109,7 +137,8 @@ class Btc_Tip_Jar {
 			$logout = wp_logout_url( get_permalink() );
 
 			$before = "Donating as {$current_user->display_name}...";
-			$after  = "<a href=\"{$logout}\">Log out</a> first to donate anonymously.";
+			$after  = "<a href=\"{$logout}\">Log out</a> ";
+			$after .= 'first to donate anonymously.';
 		} else {
 			$login = wp_login_url( get_permalink() );
 
@@ -118,7 +147,13 @@ class Btc_Tip_Jar {
 		}
 
 		$tip_jar = <<<HTML
-<input type="button" id="Btc_Tip_Jar_tip_jar" name="Btc_Tip_Jar_tip_jar" value="{$label}" />
+<input
+	type="button"
+	id="Btc_Tip_Jar_tip_jar"
+	name="Btc_Tip_Jar_tip_jar"
+	value="{$label}"
+	/>
+
 <div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
 {$before}
 <hr />
@@ -136,9 +171,16 @@ HTML;
 		require_once( 'lib/phpqrcode/qrlib.php' );
 
 		if ( $user_id ) {
-			$address = $this->btc->get_post_address_user( $post_id, $author_id, $user_id );
+			$address = $this->btc->get_post_address_user(
+				$post_id,
+				$author_id,
+				$user_id
+			);
 		} else {
-			$address = $this->btc->get_post_address_anonymous( $post_id, $author_id );
+			$address = $this->btc->get_post_address_anonymous(
+				$post_id,
+				$author_id
+			);
 		}
 
 		$filename = 'btc-tip-jar-' . $address . '.png';
@@ -146,7 +188,11 @@ HTML;
 		$path     = plugin_dir_path( __FILE__ ) . 'lib/phpqrcode/cache/codes/';
 
 		if ( !file_exists( $path . $filename ) ) {
-			QRcode::png( "bitcoin:{$address}?label=donation-to-{$label}", $path . $filename, QR_ECLEVEL_H );
+			QRcode::png(
+				"bitcoin:{$address}?label=donation-to-{$label}",
+				$path . $filename,
+				QR_ECLEVEL_H
+			);
 		}
 
 		return $path_url . $filename;

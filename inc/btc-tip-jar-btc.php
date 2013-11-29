@@ -21,12 +21,18 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		$this->connect_string  = "{$schema}://";
-		$this->connect_string .= "{$this->settings_menu['rpcuser']}:{$this->settings_menu['rpcpassword']}@";
-		$this->connect_string .= "{$this->settings_menu['rpcconnect']}:{$this->settings_menu['rpcport']}";
+		$this->connect_string .= "{$this->settings_menu['rpcuser']}:";
+		$this->connect_string .= "{$this->settings_menu['rpcpassword']}@";
+		$this->connect_string .= "{$this->settings_menu['rpcconnect']}:";
+		$this->connect_string .= "{$this->settings_menu['rpcport']}";
 
 	}
 	public function connect() {
-		require_once( plugin_dir_path( __FILE__ ) . '../lib/json-rpc-php/jsonRPCClient.php' );
+		require_once(
+			plugin_dir_path( __FILE__ )
+			.
+			'../lib/json-rpc-php/jsonRPCClient.php'
+		);
 
 		if (
 			empty( $this->settings_menu['rpcuser'] )
@@ -40,7 +46,11 @@ class Btc_Tip_Jar_Btc {
 
 		try {
 			$connection = new jsonRPCClient( $this->connect_string, false );
-			$connection->walletpassphrase( $this->settings_menu['rpcwallet'], intval( $this->settings['rpctimeout'] ) );
+
+			$connection->walletpassphrase(
+				$this->settings_menu['rpcwallet'],
+				intval( $this->settings['rpctimeout'] )
+			);
 
 			return $connection;
 		} catch( Exception $e ) {
@@ -57,7 +67,10 @@ class Btc_Tip_Jar_Btc {
 		$label  = home_url( '/' );
 		$label .= get_class() . '/' . $user;
 
-		$user_address = get_user_meta( $user, '_' . get_class() . '_account', true );
+		$user_address = get_user_meta(
+			$user, '_' . get_class() . '_account', true
+		);
+
 		if ( empty( $user_address ) ) {
 			$btc = $this->connect();
 			try {
@@ -65,7 +78,11 @@ class Btc_Tip_Jar_Btc {
 				$user_address = array();
 				$user_address['label']   = $label;
 				$user_address['address'] = $getaccountaddress;
-				update_user_meta( $user, '_' . get_class() . '_account', $user_address );
+
+				update_user_meta(
+					$user, '_' . get_class() . '_account', $user_address
+				);
+
 			} catch( Exception $e ) {
 				error_log( $e->getMessage() );
 			}
@@ -108,7 +125,9 @@ class Btc_Tip_Jar_Btc {
 
 		$author_account = $this->get_user_address( $author );
 
-		$anonymous_address = get_post_meta( $post_id, '_' . get_class() . '_anonymous', true );
+		$anonymous_address = get_post_meta(
+			$post_id, '_' . get_class() . '_anonymous', true
+		);
 
 		if ( empty( $anonymous_address ) ) {
 			$btc = $this->connect();
@@ -118,7 +137,10 @@ class Btc_Tip_Jar_Btc {
 				error_log( $e->getMessage() );
 			}
 			$anonymous_address = $getnewaddress;
-			update_post_meta( $post_id, '_' . get_class() . '_anonymous', $anonymous_address );
+
+			update_post_meta(
+				$post_id, '_' . get_class() . '_anonymous', $anonymous_address
+			);
 		}
 
 		return $anonymous_address;
