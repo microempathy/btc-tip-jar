@@ -1,65 +1,55 @@
 <?php
 
 class Btc_Tip_Jar_Btc {
-	private $rpcconnect;
-	private $rpcssl;
-	private $rpcport;
-	private $rpcuser;
-	private $rpcpassword;
-	private $rpcwallet;
+	private $settings;
+
+	private $settings_menu;
+
+	private $database;
 
 	private $connect_string;
 
-	public function __construct(
-		$rpcconnect,
-		$rpcssl,
-		$rpcport,
-		$rpcuser,
-		$rpcpassword,
-		$rpcwallet,
-		$rpctimeout
-	) {
-		$this->rpcconnect  = $rpcconnect;
-		$this->rpcssl      = $rpcssl;
-		$this->rpcport     = $rpcport;
-		$this->rpcuser     = $rpcuser;
-		$this->rpcpassword = $rpcpassword;
-		$this->rpcwallet   = $rpcwallet;
-		$this->rpctimeout  = $rpctimeout;
+	public function __construct( $settings, $settings_menu, $database ) {
+		$this->settings = $settings;
+		$this->settings_menu = $settings_menu;
+		$this->database = $database;
 
-		if ( $this->rpcssl ) {
+		if ( $this->settings_menu['rpcssl'] ) {
 			$schema = 'https';
 		} else {
 			$schema = 'http';
 		}
 
 		$this->connect_string  = "{$schema}://";
-		$this->connect_string .= "{$this->rpcuser}:{$this->rpcpassword}@";
-		$this->connect_string .= "{$this->rpcconnect}:{$this->rpcport}";
+		$this->connect_string .= "{$this->settings_menu['rpcuser']}:{$this->settings_menu['rpcpassword']}@";
+		$this->connect_string .= "{$this->settings_menu['rpcconnect']}:{$this->settings_menu['rpcport']}";
 
 	}
 	public function connect() {
 		require_once( plugin_dir_path( __FILE__ ) . '../lib/json-rpc-php/jsonRPCClient.php' );
 
 		if (
-			empty( $this->rpcuser )
+			empty( $this->settings_menu['rpcuser'] )
 			||
-			empty( $this->rpcpassword )
+			empty( $this->settings_menu['rpcpassword'] )
 			||
-			empty( $this->rpcwallet )
+			empty( $this->settings_menu['rpcwallet'] )
 		) {
 			return false;
 		}
 
 		try {
 			$connection = new jsonRPCClient( $this->connect_string, false );
-			$connection->walletpassphrase( $this->rpcwallet, intval( $this->rpctimeout ) );
+			$connection->walletpassphrase( $this->settings_menu['rpcwallet'], intval( $this->settings['rpctimeout'] ) );
 
 			return $connection;
 		} catch( Exception $e ) {
 			error_log( $e->getMessage() );
 			return false;
 		}
+
+	}
+	public function get_tx_history() {
 
 	}
 	public function get_user_address( $user ) {
@@ -86,35 +76,25 @@ class Btc_Tip_Jar_Btc {
 	public function get_post_address_user( $post_id, $author_id, $user_id ) {
 
 		$author_account = $this->get_user_address( $author_id );
-		global $wpdb;
-		$settings = get_option( 'Btc_Tip_Jar' );
 
-		$sql = <<<SQL
-SELECT
-	address
-	FROM {$settings['addresses_table']}
-	WHERE post_id   = {$post_id}
-	  AND author_id = {$author_id}
-	  AND user_id   = {$user_id}
-	LIMIT 1;
-SQL;
+		$address = $this->database->get_user_address_query(
+			$post_id,
+			$author_id,
+			$user_id
+		);
 
-		$address = $wpdb->get_results( $sql );
-
-		if ( !empty( $address[0]->address ) ) {
-			return $address->address;
+		if ( !empty( $address ) ) {
+			return $address;
 		} else {
 			$btc = $this->connect();
 			try {
 				$getnewaddress = $btc->getnewaddress( $author_account['label'] );
-				$wpdb->insert(
-					$settings['addresses_table'],
-					array(
-						'author_id' => $author_id,
-						'post_id'   => $post_id,
-						'user_id'   => $user_id,
-						'address'   => $getnewaddress,
-					)
+
+				$this->database->insert_post_address_user(
+					$author_id,
+					$post_id,
+					$user_id,
+					$getnewaddress
 				);
 
 				return $getnewaddress;
@@ -129,6 +109,7 @@ SQL;
 		$author_account = $this->get_user_address( $author );
 
 		$anonymous_address = get_post_meta( $post_id, '_' . get_class() . '_anonymous', true );
+
 		if ( empty( $anonymous_address ) ) {
 			$btc = $this->connect();
 			try {
