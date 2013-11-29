@@ -90,16 +90,50 @@ class Btc_Tip_Jar {
 
 		$label = "Bitcoins Donated: {$total_donated}";
 
+		$qr_url = $this->get_qr_url( $address, 'donation-' . $post->post_name );
+
+		if ( is_user_logged_in() ) {
+			global $current_user;
+			get_currentuserinfo();
+
+			$logout = wp_logout_url( get_permalink() );
+
+			$before = "Donating as {$current_user->display_name}...";
+			$after  = "<a href=\"{$logout}\">Log out</a> first to donate anonymously.";
+		} else {
+			$login = wp_login_url( get_permalink() );
+
+			$before = 'Donating anonymously';
+			$after  = "<a href=\"{$login}\">Log in</a> first to take credit!";
+		}
+
 		$tip_jar = <<<HTML
 <input type="button" id="Btc_Tip_Jar_tip_jar" name="Btc_Tip_Jar_tip_jar" value="{$label}" />
 <div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
-		{$address}
+{$before}
+<hr />
+		<img src="{$qr_url}" />
+<hr />
+{$after}
 </div>
 HTML;
 
 		$content .= "<br />\n" . $tip_jar;
 
 		return $content;
+	}
+	public function get_qr_url( $address, $label ) {
+		require_once( 'lib/phpqrcode/qrlib.php' );
+
+		$filename = 'btc-tip-jar-' . md5( $address . $label ) . '.png';
+		$path_url = plugins_url( '/lib/phpqrcode/cache/codes/', __FILE__ );
+		$path     = plugin_dir_path( __FILE__ ) . 'lib/phpqrcode/cache/codes/';
+
+		if ( !file_exists( $path . $filename ) ) {
+			QRcode::png( "bitcoin:{$address}?label={$label}", $path . $filename, QR_ECLEVEL_H );
+		}
+
+		return $path_url . $filename;
 	}
 }
 $btc_tip_jar = new Btc_Tip_Jar();

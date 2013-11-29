@@ -54,7 +54,7 @@ class Btc_Tip_Jar_Btc {
 		error_log( $this->connect_string );
 
 		try {
-			$connection = new jsonRPCClient( $this->connect_string, true );
+			$connection = new jsonRPCClient( $this->connect_string, false );
 			$connection->walletpassphrase( $this->rpcwallet, intval( $this->rpctimeout ) );
 
 			return $connection;
