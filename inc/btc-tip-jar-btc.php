@@ -45,7 +45,7 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		try {
-			$connection = new jsonRPCClient( $this->connect_string, false );
+			$connection = new jsonRPCClient( $this->connect_string, $this->settings['debug'] );
 
 			$connection->walletpassphrase(
 				$this->settings_menu['rpcwallet'],
@@ -59,8 +59,29 @@ class Btc_Tip_Jar_Btc {
 		}
 
 	}
-	public function get_tx_history() {
+	public function refresh_tx_history() {
+		$connection = $this->connect();
 
+		try {
+			if ( !empty( $this->settings['lastblock'] ) ) {
+				$history = $connection->listsinceblock( $this->settings['lastblock'] );
+			} else {
+				$history = $connection->listtransactions(
+					'',
+					$this->settings['list_tx_max'],
+					0
+				);
+			}
+		} catch( Exception $e ) {
+			error_log( $e->getMessage() );
+		}
+
+		$this->settings['lastblock'] = $history['lastblock'];
+		update_option( 'Btc_Tip_Jar', $this->settings );
+
+		if ( !empty( $history['transactions'] ) ) {
+			$this->database->insert_transactions( $history['transactions'] );
+		}
 	}
 	public function get_user_address( $user ) {
 

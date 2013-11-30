@@ -20,9 +20,10 @@ class Btc_Tip_Jar {
 	public function __construct() {
 
 		$settings = array(
+			'debug'       => false,
 			'rpctimeout'  => 2,
-			'list_tx_max' => 25,
-			'lastblock'   => null,
+			'list_tx_max' => 999,
+			'lastblock'   => false,
 		);
 		$this->settings = get_option( get_class(), $settings );
 		update_option( get_class(), $this->settings );
@@ -59,7 +60,7 @@ class Btc_Tip_Jar {
 
 		register_activation_hook(
 			__FILE__,
-			array( &$this->database, 'create_tx_history_table' )
+			array( &$this->database, 'create_transactions_table' )
 		);
 
 		register_activation_hook(
@@ -129,6 +130,7 @@ class Btc_Tip_Jar {
 			);
 		}
 
+		$this->btc->refresh_tx_history();
 		$total_donated = 0.0;
 
 		$label = "Bitcoins Donated: {$total_donated}";

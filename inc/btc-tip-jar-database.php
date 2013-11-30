@@ -17,33 +17,39 @@ class Btc_Tip_Jar_Database {
 		$this->settings_menu = $settings_menu;
 
 		$db_prefix = 'Btc_Tip_Jar';
-		$tx_history_table = "{$this->wpdb->base_prefix}{$db_prefix}_tx_history";
-		$addresses_table  = "{$this->wpdb->base_prefix}{$db_prefix}_addresses";
+		$transactions_table = "{$this->wpdb->base_prefix}{$db_prefix}_transactions";
+		$addresses_table    = "{$this->wpdb->base_prefix}{$db_prefix}_addresses";
 
 		$settings_database = array(
-			'db_prefix'        => $db_prefix,
-			'tx_history_table' => $tx_history_table,
-			'addresses_table'  => $addresses_table,
+			'db_prefix'          => $db_prefix,
+			'transactions_table' => $transactions_table,
+			'addresses_table'    => $addresses_table,
 		);
+
+		delete_option( get_class() );
 
 		$this->settings_database = get_option( get_class(), $settings_database );
 		update_option( get_class(), $this->settings_database );
 	}
-	public function create_tx_history_table() {
+	public function create_transactions_table() {
 
-		$tx_history_sql = <<<SQL
-CREATE TABLE {$this->settings_database['tx_history_table']} (
-	id        mediumint(9) NOT NULL AUTO_INCREMENT,
-	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-	author_id mediumint(9) NOT NULL,
-	post_id   mediumint(9) NOT NULL,
-	user_id   mediumint(9) NOT NULL,
+		$transactions_sql = <<<SQL
+CREATE TABLE {$this->settings_database['transactions_table']} (
+	fee       DECIMAL(16,8) DEFAULT 0.0,
+	amount    DECIMAL(16,8) DEFAULT 0.0,
+	blockindex VARCHAR(64) NOT NULL,
+	category  VARCHAR(64)  NOT NULL,
+	confirmations mediumint(9) DEFAULT 0,
 	address   VARCHAR(64)  NOT NULL,
-	UNIQUE KEY (id)
+	txid      VARCHAR(64)  NOT NULL,
+	block     mediumint(9) NOT NULL,
+	blockhash VARCHAR(64)  NOT NULL,
+	account   varchar(64)  NULL,
+	UNIQUE KEY (txid)
 );
 SQL;
 
-		DbDelta( $tx_history_sql );
+		DbDelta( $transactions_sql );
 
 	}
 	public function create_addresses_table() {
@@ -76,7 +82,11 @@ SQL;
 
 		$results = $this->wpdb->get_results( $sql );
 
-		return $results[0]->address;
+		if ( !empty( $results[0] ) ) {
+			return $results[0]->address;
+		} else {
+			return false;
+		}
 	}
 	public function insert_post_address_user(
 		$author_id,
@@ -93,6 +103,25 @@ SQL;
 				'address'   => $getnewaddress,
 			)
 		);
+	}
+	public function insert_transactions( $transactions ) {
+		foreach ( $transactions as $transaction ) {
+			$this->wpdb->insert(
+				$this->settings_database['transactions_table'],
+				array(
+				'fee'           => $transaction['fee'],
+				'amount'        => $transaction['amount'],
+				'blockindex'    => $transaction['blockindex'],
+				'category'      => $transaction['category'],
+				'confirmations' => $transaction['confirmations'],
+				'address'       => $transaction['address'],
+				'txid'          => $transaction['txid'],
+				'block'         => $transaction['block'],
+				'blockhash'     => $transaction['blockhash'],
+				'account'       => $transaction['account'],
+				)
+			);
+		}
 	}
 }
 
