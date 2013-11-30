@@ -130,11 +130,6 @@ class Btc_Tip_Jar {
 			);
 		}
 
-		$this->btc->refresh_tx_history();
-		$total_donated = 0.0;
-
-		$label = "Bitcoins Donated: {$total_donated}";
-
 		if ( is_user_logged_in() ) {
 			$logout = wp_logout_url( get_permalink() );
 
@@ -147,6 +142,12 @@ class Btc_Tip_Jar {
 			$before = 'Donating anonymously...';
 			$after  = "<a href=\"{$login}\">Log in</a> first to take credit!";
 		}
+
+		$this->btc->refresh_tx_history();
+		$donated = $this->get_donated_post( $post->ID );
+
+		$label  = 'Bitcoins Donated: ';
+		$label .= sprintf( '%0.5f', $donated['btc'] );
 
 		$tip_jar = <<<HTML
 <input
@@ -198,6 +199,14 @@ HTML;
 		}
 
 		return $path_url . $filename;
+	}
+	public function get_donated_post( $post_id ) {
+		$donated = array();
+
+		$donated['btc'] = $this->database->get_donated_post( $post_id );
+
+		$donated['usd'] = 5000;
+		return $donated;
 	}
 }
 $btc_tip_jar = new Btc_Tip_Jar();

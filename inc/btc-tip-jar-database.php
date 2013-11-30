@@ -123,6 +123,24 @@ SQL;
 			);
 		}
 	}
+	public function get_donated_post( $post_id ) {
+		$donations_query = <<<SQL
+SELECT
+	SUM( trx.amount ) AS btc
+	FROM {$this->settings_database['addresses_table']} AS adr
+	INNER JOIN {$this->settings_database['transactions_table']} AS trx
+	ON  trx.address  = adr.address
+	AND trx.category = 'receive'
+	WHERE adr.post_id = {$post_id};
+SQL;
+
+		$donations = $this->wpdb->get_results( $donations_query );
+		if ( !empty( $donations[0] ) ) {
+			return $donations[0]->btc;
+		} else {
+			return 0.0;
+		}
+	}
 }
 
 ?>
