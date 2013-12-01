@@ -40,6 +40,8 @@ public function menu() {
 		$this->menu_page_item( 'rpcuser', __( 'Username' ) );
 		$this->menu_page_item( 'rpcpassword', __( 'Password' ) );
 		$this->menu_page_item( 'rpcwallet', __( 'Wallet Password' ) );
+		$this->menu_page_item( 'fx', __( 'Conversion Currency' ) );
+		$this->menu_page_item( 'decimals', __( 'Bitcoin Decimals' ) );
 
 		echo '</table>';
 		submit_button();

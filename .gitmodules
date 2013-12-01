@@ -4,3 +4,6 @@
 [submodule "lib/phpqrcode"]
 	path = lib/phpqrcode
 	url = git@github.com:wikitopian/phpqrcode.git
+[submodule "scripts/jquery-formatcurrency"]
+	path = scripts/jquery-formatcurrency
+	url = git@github.com:fernandofig/jquery-formatcurrency.git

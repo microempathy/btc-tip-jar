@@ -62,6 +62,10 @@ class Btc_Tip_Jar_Btc {
 	public function refresh_tx_history() {
 		$connection = $this->connect();
 
+		if ( !$connection ) {
+			return false;
+		}
+
 		try {
 			if ( !empty( $this->settings['lastblock'] ) ) {
 				$history = $connection->listsinceblock( $this->settings['lastblock'] );

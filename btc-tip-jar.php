@@ -24,6 +24,7 @@ class Btc_Tip_Jar {
 			'rpctimeout'  => 2,
 			'list_tx_max' => 999,
 			'lastblock'   => false,
+			'fx_rate_url' => 'blockchain.info/ticker',
 		);
 		$this->settings = get_option( get_class(), $settings );
 		update_option( get_class(), $this->settings );
@@ -36,6 +37,8 @@ class Btc_Tip_Jar {
 			'rpcuser'     => null,
 			'rpcpassword' => null,
 			'rpcwallet'   => null,
+			'fx'          => 'USD',
+			'decimals'    => 5,
 		);
 
 		$this->settings_menu = get_option(
@@ -103,6 +106,26 @@ class Btc_Tip_Jar {
 			false,
 			true
 		);
+
+		wp_enqueue_script(
+			get_class() . '_formatCurrency',
+			plugins_url( '/scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
+			array(
+				'jquery',
+			),
+			false,
+			true
+		);
+
+		wp_localize_script(
+			get_class(),
+			get_class(),
+			array(
+				'fx_rate_url' => $this->settings['fx_rate_url'],
+				'fx'          => $this->menu->settings['fx'],
+				'decimals'    => $this->menu->settings['decimals'],
+			)
+		);
 	}
 	public function add_post_tip_jar( $content = '' ) {
 
@@ -144,17 +167,15 @@ class Btc_Tip_Jar {
 		}
 
 		$this->btc->refresh_tx_history();
-		$donated = $this->get_donated_post( $post->ID );
-
-		$label  = 'Bitcoins Donated: ';
-		$label .= sprintf( '%0.5f', $donated['btc'] );
+		$donated = $this->database->get_donated_post( $post->ID );
 
 		$tip_jar = <<<HTML
 <input
 	type="button"
 	id="Btc_Tip_Jar_tip_jar"
 	name="Btc_Tip_Jar_tip_jar"
-	value="{$label}"
+	value="Bitcoin Tip Jar"
+	data-btc="{$donated}"
 	/>
 
 <div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
@@ -199,14 +220,6 @@ HTML;
 		}
 
 		return $path_url . $filename;
-	}
-	public function get_donated_post( $post_id ) {
-		$donated = array();
-
-		$donated['btc'] = $this->database->get_donated_post( $post_id );
-
-		$donated['usd'] = 5000;
-		return $donated;
 	}
 }
 $btc_tip_jar = new Btc_Tip_Jar();
