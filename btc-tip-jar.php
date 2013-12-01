@@ -170,13 +170,18 @@ class Btc_Tip_Jar {
 		$donated = $this->database->get_donated_post( $post->ID );
 
 		$tip_jar = <<<HTML
-<input
-	type="button"
-	id="Btc_Tip_Jar_tip_jar"
-	name="Btc_Tip_Jar_tip_jar"
-	value="Bitcoin Tip Jar"
-	data-btc="{$donated}"
-	/>
+<div class="sharedaddy">
+	<div class="sd-block">
+		<input
+			type="button"
+			id="Btc_Tip_Jar_tip_jar"
+			name="Btc_Tip_Jar_tip_jar"
+			title="Bitcoin Tip This Post"
+			value="Tip This Post"
+			data-btc="{$donated}"
+			/>
+	</div>
+</div>
 
 <div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
 {$before}

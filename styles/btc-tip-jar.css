@@ -1,7 +1,9 @@
 #Btc_Tip_Jar_tip_jar {
 	display: block;
-	margin-left: auto;
-	margin-right: auto;
+	float: right;
+
+	font-size: x-small;
+	font-weight: bold;
 }
 
 #Btc_Tip_Jar_dialog {

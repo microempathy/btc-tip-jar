@@ -39,7 +39,13 @@ jQuery( document ).ready(function( $ ) {
 				}
 			);
 			if( btc > 0 ) {
-				$( "#Btc_Tip_Jar_tip_jar" ).val( btc_donated + ' (' + fx_donated + ')' );
+				$( "#Btc_Tip_Jar_tip_jar" ).val(
+					'Donated: '
+					+
+					btc_donated
+					+
+					' (' + fx_donated + ')'
+				);
 			}
 		}
 	});
