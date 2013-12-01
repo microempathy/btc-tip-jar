@@ -61,6 +61,10 @@ class Btc_Tip_Jar {
 			$this->settings, $this->settings_menu, $this->database
 		);
 
+		// user menus and functionality
+		require_once( 'inc/btc-tip-jar-user.php' );
+		$this->user = new Btc_Tip_Jar_User();
+
 		register_activation_hook(
 			__FILE__,
 			array( &$this->database, 'create_transactions_table' )

@@ -46,7 +46,6 @@ public function menu() {
 		echo '</table>';
 		submit_button();
 		echo '</form></div>';
-
 	}
 private function menu_page_item( $item, $label ) {
 
