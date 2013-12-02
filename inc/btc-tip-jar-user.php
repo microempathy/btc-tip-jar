@@ -41,8 +41,8 @@ class Btc_Tip_Jar_User {
 
 		$summary = add_submenu_page(
 			get_class(),
-			'Bitcoin Tip Jar - Summary',
-			'Summary',
+			'Bitcoin Tip Jar - Overview',
+			'Overview',
 			'read',
 			get_class(),
 			array( &$this->summary, 'do_page' )
