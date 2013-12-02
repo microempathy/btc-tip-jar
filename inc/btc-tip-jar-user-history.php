@@ -7,7 +7,12 @@ class Btc_Tip_Jar_User_History {
 		$this->user = $user;
 	}
 	public function do_page() {
-		echo wp_kses( get_class() );
+
+		echo '<div id="wrap">';
+		screen_icon();
+		echo '<h1>Bitcoin Tip Jar - Transaction History</h1>';
+
+		echo '</div>';
 	}
 }
 

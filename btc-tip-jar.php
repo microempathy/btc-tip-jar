@@ -63,7 +63,7 @@ class Btc_Tip_Jar {
 
 		// user menus and functionality
 		require_once( 'inc/btc-tip-jar-user.php' );
-		$this->user = new Btc_Tip_Jar_User();
+		$this->user = new Btc_Tip_Jar_User( $this );
 
 		register_activation_hook(
 			__FILE__,
