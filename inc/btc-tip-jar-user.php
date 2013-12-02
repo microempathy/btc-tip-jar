@@ -39,60 +39,29 @@ class Btc_Tip_Jar_User {
 			71
 		);
 
-		$summary = add_submenu_page(
+		$this->do_page( 'Bitcoin Tip Jar - Overview', 'Overview', '' );
+		$this->do_page( 'Bitcoin Tip Jar - Deposit Bitcoins', 'Deposit', '_deposit' );
+		$this->do_page( 'Bitcoin Tip Jar - Withdraw Bitcoins', 'Withdraw', '_withdraw' );
+		$this->do_page( 'Bitcoin Tip Jar - Transaction History', 'History', '_history' );
+	}
+	private function do_page( $title, $menu_title, $page_slug ) {
+		$page = add_submenu_page(
 			get_class(),
-			'Bitcoin Tip Jar - Overview',
-			'Overview',
+			$title,
+			$menu_title,
 			'read',
-			get_class(),
+			get_class() . $page_slug,
 			array( &$this->summary, 'do_page' )
 		);
 
 		add_action(
-			'admin_print_styles-' . $summary,
-			array( &$this, 'print_scripts_and_styles' )
-		);
-
-		$deposit = add_submenu_page(
-			get_class(),
-			'Bitcoin Tip Jar - Deposit Bitcoins',
-			'Deposit',
-			'read',
-			get_class() . '_deposit',
-			array( &$this->deposit, 'do_page' )
+			'admin_print_scripts-' . $page,
+			array( &$this, 'print_script' )
 		);
 
 		add_action(
-			'admin_print_styles-' . $deposit,
-			array( &$this, 'print_scripts_and_styles' )
-		);
-
-		$withdraw = add_submenu_page(
-			get_class(),
-			'Bitcoin Tip Jar - Withdraw Bitcoins',
-			'Withdraw',
-			'read',
-			get_class() . '_withdraw',
-			array( &$this->withdraw, 'do_page' )
-		);
-
-		add_action(
-			'admin_print_styles-' . $withdraw,
-			array( &$this, 'print_scripts_and_styles' )
-		);
-
-		$history = add_submenu_page(
-			get_class(),
-			'Bitcoin Tip Jar - Transaction History',
-			'History',
-			'read',
-			get_class() . '_history',
-			array( &$this->history, 'do_page' )
-		);
-
-		add_action(
-			'admin_print_styles-' . $history,
-			array( &$this, 'print_scripts_and_styles' )
+			'admin_print_styles-' . $page,
+			array( &$this, 'print_style' )
 		);
 	}
 	public function do_scripts_and_styles() {
@@ -100,8 +69,16 @@ class Btc_Tip_Jar_User {
 			get_class(),
 			plugins_url( '/../styles/btc-tip-jar-admin.css', __FILE__ )
 		);
+
+		wp_register_script(
+			get_class(),
+			plugins_url( '/../scripts/btc-tip-jar-admin.js', __FILE__ )
+		);
 	}
-	public function print_scripts_and_styles() {
+	public function print_script() {
+		wp_enqueue_script( get_class() );
+	}
+	public function print_style() {
 		wp_enqueue_style( get_class() );
 	}
 }
