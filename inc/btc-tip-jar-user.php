@@ -97,9 +97,28 @@ class Btc_Tip_Jar_User {
 			get_class(),
 			plugins_url( '/../scripts/btc-tip-jar-admin.js', __FILE__ )
 		);
+
+		wp_register_script(
+			get_class() . '_formatCurrency',
+			plugins_url( '/../scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
+			array(
+				'jquery',
+			),
+			false,
+			true
+		);
+
+		wp_localize_script(
+			get_class(),
+			get_class(),
+			array(
+				'decimals' => $this->tip_jar->menu->settings['decimals'],
+			)
+		);
 	}
 	public function print_script() {
 		wp_enqueue_script( get_class() );
+		wp_enqueue_script( get_class() . '_formatCurrency' );
 	}
 	public function print_style() {
 		wp_enqueue_style( get_class() );

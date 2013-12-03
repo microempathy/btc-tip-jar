@@ -11,7 +11,7 @@
 
 class Btc_Tip_Jar {
 	public $database;
-	private $menu;
+	public $menu;
 	private $btc;
 
 	private $settings;

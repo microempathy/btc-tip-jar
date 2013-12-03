@@ -1,3 +1,7 @@
 div.icon32#icon-Btc_Tip_Jar_User {
     background-image: url( '../images/btc-tip-jar-32.png' );
 }
+
+table.wp-list-table {
+    max-width: 99%;
+}
