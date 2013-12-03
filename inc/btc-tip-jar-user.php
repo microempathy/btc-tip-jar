@@ -1,7 +1,7 @@
 <?php
 
 class Btc_Tip_Jar_User {
-	protected $tip_jar;
+	public $tip_jar;
 
 	private $summary;
 	private $deposit;
@@ -39,19 +39,42 @@ class Btc_Tip_Jar_User {
 			71
 		);
 
-		$this->do_page( 'Bitcoin Tip Jar - Overview', 'Overview', '' );
-		$this->do_page( 'Bitcoin Tip Jar - Deposit Bitcoins', 'Deposit', '_deposit' );
-		$this->do_page( 'Bitcoin Tip Jar - Withdraw Bitcoins', 'Withdraw', '_withdraw' );
-		$this->do_page( 'Bitcoin Tip Jar - Transaction History', 'History', '_history' );
+		$this->do_page(
+			'Bitcoin Tip Jar - Overview',
+			'Overview',
+			'',
+			$this->summary
+		);
+
+		$this->do_page(
+			'Bitcoin Tip Jar - Deposit Bitcoins',
+			'Deposit',
+			'_deposit',
+			$this->deposit
+		);
+
+		$this->do_page(
+			'Bitcoin Tip Jar - Withdraw Bitcoins',
+			'Withdraw',
+			'_withdraw',
+			$this->withdraw
+		);
+
+		$this->do_page(
+			'Bitcoin Tip Jar - Transaction History',
+			'History',
+			'_history',
+			$this->history
+		);
 	}
-	private function do_page( $title, $menu_title, $page_slug ) {
+	private function do_page( $title, $menu_title, $page_slug, $print ) {
 		$page = add_submenu_page(
 			get_class(),
 			$title,
 			$menu_title,
 			'read',
 			get_class() . $page_slug,
-			array( &$this->summary, 'do_page' )
+			array( &$print, 'do_page' )
 		);
 
 		add_action(

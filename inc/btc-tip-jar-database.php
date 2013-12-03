@@ -58,9 +58,10 @@ SQL;
 CREATE TABLE {$this->settings_database['addresses_table']} (
 	id        mediumint(9) NOT NULL AUTO_INCREMENT,
 	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-	author_id mediumint(9) NOT NULL,
+	type      VARCHAR(16)  NOT NULL,
+	tx_id     mediumint(9) NOT NULL,
+	rx_id     mediumint(9) NOT NULL,
 	post_id   mediumint(9) NOT NULL,
-	user_id   mediumint(9) NOT NULL,
 	address   VARCHAR(64)  NOT NULL,
 	UNIQUE KEY (id)
 );
@@ -68,15 +69,19 @@ SQL;
 
 		dbDelta( $addresses_table_sql );
 	}
-	public function get_user_address_query( $post_id, $author_id, $user_id ) {
+	public function get_user_address_query(
+		$post_id,
+		$rx_id,
+		$tx_id
+	) {
 
 		$sql = <<<SQL
 SELECT
 	address
 	FROM {$this->settings_database['addresses_table']}
 	WHERE post_id   = {$post_id}
-	  AND author_id = {$author_id}
-	  AND user_id   = {$user_id}
+	  AND rx_id     = {$rx_id}
+	  AND tx_id     = {$tx_id}
 	LIMIT 1;
 SQL;
 
@@ -88,19 +93,15 @@ SQL;
 			return false;
 		}
 	}
-	public function insert_post_address_user(
-		$author_id,
-		$post_id,
-		$user_id,
-		$getnewaddress
-	) {
+	public function insert_post_address_user( $post_id, $rx_id, $tx_id, $address ) {
 		$this->wpdb->insert(
 			$this->settings_database['addresses_table'],
 			array(
-				'author_id' => $author_id,
+				'type'      => 'tip',
 				'post_id'   => $post_id,
-				'user_id'   => $user_id,
-				'address'   => $getnewaddress,
+				'rx_id'     => $rx_id,
+				'tx_id'     => $tx_id,
+				'address'   => $address,
 			)
 		);
 	}
@@ -130,6 +131,7 @@ SELECT
 	FROM {$this->settings_database['addresses_table']} AS adr
 	INNER JOIN {$this->settings_database['transactions_table']} AS trx
 	ON  trx.address  = adr.address
+	AND adr.type     = 'tip'
 	AND trx.category = 'receive'
 	WHERE adr.post_id = {$post_id};
 SQL;
@@ -140,6 +142,44 @@ SQL;
 		} else {
 			return 0.0;
 		}
+	}
+	public function get_transactions( $user, $type, $first, $final ) {
+
+		if ( $type == 'all' ) {
+			$type_snippet = '';
+		} else {
+			$type_snippet = "AND adr.type = '{$type}'";
+		}
+
+		$transactions_query = <<<TRANSACTIONS
+SELECT
+	adr.time,
+	adr.type,
+	adr.post_id,
+	adr.tx_id,
+	adr.rx_id,
+	trx.amount
+	FROM {$this->settings_database['addresses_table']} AS adr
+	INNER JOIN {$this->settings_database['transactions_table']} AS trx
+	ON  trx.address  = adr.address
+	AND trx.category = 'receive'
+	WHERE
+	(
+		adr.tx_id = {$user}
+		OR
+		adr.rx_id = {$user}
+	)
+	  {$type_snippet}
+	  AND
+	(
+		adr.time >= '{$first}'
+		AND
+		adr.time <= '{$final}'
+	);
+TRANSACTIONS;
+
+		$transactions = $this->wpdb->get_results( $transactions_query, ARRAY_A );
+		return $transactions;
 	}
 }
 

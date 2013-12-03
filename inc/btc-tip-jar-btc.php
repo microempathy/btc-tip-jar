@@ -133,8 +133,8 @@ class Btc_Tip_Jar_Btc {
 				$getnewaddress = $btc->getnewaddress( $author_account['label'] );
 
 				$this->database->insert_post_address_user(
-					$author_id,
 					$post_id,
+					$author_id,
 					$user_id,
 					$getnewaddress
 				);
