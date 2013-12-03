@@ -11,8 +11,6 @@ jQuery( document ).ready(function( $ ) {
 		$( "#Btc_Tip_Jar_dialog" ).dialog( "open" );
 	});
 
-	console.log( Btc_Tip_Jar.fx );
-
 	var fx_rate_url = 'https://' + Btc_Tip_Jar.fx_rate_url + '?cors=true';
 
 	$.ajax({
