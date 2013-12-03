@@ -1,6 +1,6 @@
 <?php
 
-class Btc_Tip_Jar_User_History {
+class Btc_Tip_Jar_User_Overview {
 	private $user;
 
 	public function __construct( $user ) {
@@ -12,7 +12,7 @@ class Btc_Tip_Jar_User_History {
 
 		echo '<div id="wrap">';
 		screen_icon();
-		echo '<h1>Bitcoin Tip Jar - Transaction History</h1>';
+		echo '<h1>Bitcoin Tip Jar - Overview</h1>';
 
 		$this->table->get_transactions( $this->get_transactions() );
 
@@ -117,5 +117,7 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}
 }
+
+
 
 ?>

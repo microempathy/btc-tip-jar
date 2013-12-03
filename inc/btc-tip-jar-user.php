@@ -3,17 +3,16 @@
 class Btc_Tip_Jar_User {
 	public $tip_jar;
 
-	private $summary;
+	private $overview;
 	private $deposit;
 	private $withdraw;
 	private $transfer;
-	private $history;
 
 	public function __construct( $tip_jar ) {
 		$this->tip_jar = $tip_jar;
 
-		require_once( 'btc-tip-jar-user-summary.php' );
-		$this->summary = new Btc_Tip_Jar_User_Summary( $this );
+		require_once( 'btc-tip-jar-user-overview.php' );
+		$this->overview = new Btc_Tip_Jar_User_Overview( $this );
 
 		require_once( 'btc-tip-jar-user-deposit.php' );
 		$this->deposit = new Btc_Tip_Jar_User_Deposit( $this );
@@ -23,9 +22,6 @@ class Btc_Tip_Jar_User {
 
 		require_once( 'btc-tip-jar-user-transfer.php' );
 		$this->transfer = new Btc_Tip_Jar_User_Transfer( $this );
-
-		require_once( 'btc-tip-jar-user-history.php' );
-		$this->history = new Btc_Tip_Jar_User_History( $this );
 
 		add_action( 'admin_menu', array( &$this, 'do_menu' ) );
 
@@ -38,7 +34,7 @@ class Btc_Tip_Jar_User {
 			'Tip Jar',
 			'read',
 			get_class(),
-			array( &$this->summary, 'do_page' ),
+			array( &$this->overview, 'do_page' ),
 			plugins_url( '../images/btc-tip-jar-16.png', __FILE__ ),
 			71
 		);
@@ -47,7 +43,7 @@ class Btc_Tip_Jar_User {
 			'Bitcoin Tip Jar - Overview',
 			'Overview',
 			'',
-			$this->summary
+			$this->overview
 		);
 
 		$this->do_page(
@@ -69,13 +65,6 @@ class Btc_Tip_Jar_User {
 			'Transfer',
 			'_transfer',
 			$this->transfer
-		);
-
-		$this->do_page(
-			'Bitcoin Tip Jar - Transaction History',
-			'History',
-			'_history',
-			$this->history
 		);
 	}
 	private function do_page( $title, $menu_title, $page_slug, $print ) {
