@@ -6,6 +6,7 @@ class Btc_Tip_Jar_User {
 	private $summary;
 	private $deposit;
 	private $withdraw;
+	private $transfer;
 	private $history;
 
 	public function __construct( $tip_jar ) {
@@ -19,6 +20,9 @@ class Btc_Tip_Jar_User {
 
 		require_once( 'btc-tip-jar-user-withdraw.php' );
 		$this->withdraw = new Btc_Tip_Jar_User_Withdraw( $this );
+
+		require_once( 'btc-tip-jar-user-transfer.php' );
+		$this->transfer = new Btc_Tip_Jar_User_Transfer( $this );
 
 		require_once( 'btc-tip-jar-user-history.php' );
 		$this->history = new Btc_Tip_Jar_User_History( $this );
@@ -58,6 +62,13 @@ class Btc_Tip_Jar_User {
 			'Withdraw',
 			'_withdraw',
 			$this->withdraw
+		);
+
+		$this->do_page(
+			'Bitcoin Tip Jar - Transfer Bitcoins',
+			'Transfer',
+			'_transfer',
+			$this->transfer
 		);
 
 		$this->do_page(
