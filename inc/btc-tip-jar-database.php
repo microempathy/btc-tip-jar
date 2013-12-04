@@ -45,6 +45,7 @@ CREATE TABLE {$this->settings_database['transactions_table']} (
 	block     mediumint(9) NOT NULL,
 	blockhash VARCHAR(64)  NOT NULL,
 	account   varchar(64)  NULL,
+	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
 	UNIQUE KEY (txid)
 );
 SQL;
@@ -57,7 +58,6 @@ SQL;
 		$addresses_table_sql = <<<SQL
 CREATE TABLE {$this->settings_database['addresses_table']} (
 	id        mediumint(9) NOT NULL AUTO_INCREMENT,
-	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
 	type      VARCHAR(16)  NOT NULL,
 	tx_id     mediumint(9) NOT NULL,
 	rx_id     mediumint(9) NOT NULL,
@@ -125,6 +125,7 @@ SQL;
 		}
 	}
 	public function get_donated_post( $post_id ) {
+
 		$donations_query = <<<SQL
 SELECT
 	SUM( trx.amount ) AS btc
@@ -138,12 +139,35 @@ SQL;
 
 		$donations = $this->wpdb->get_results( $donations_query );
 		if ( !empty( $donations[0] ) ) {
-			return $donations[0]->btc;
+			$donations = $donations[0]->btc;
 		} else {
-			return 0.0;
+			$donations = 0.0;
+		}
+
+		$anon_address = get_post_meta( $post_id, '_Btc_Tip_Jar_Btc_anonymous', true );
+
+		$anon_donations_query = <<<SQL
+SELECT
+	SUM( trx.amount ) AS btc
+	FROM {$this->settings_database['transactions_table']} AS trx
+	WHERE trx.address  = '{$anon_address}'
+	  AND trx.category = 'receive';
+SQL;
+
+		$anon_donations = $this->wpdb->get_results( $anon_donations_query );
+
+		if ( !empty( $anon_donations[0] ) ) {
+			return $donations + $anon_donations[0]->btc;
+		} else {
+			return $donations;
 		}
 	}
 	public function get_transactions( $user, $type, $first, $final ) {
+
+		$user_anonymous = get_user_meta(
+			$user, '_' . 'Btc_Tip_Jar_Btc_account', true
+		);
+		$user_anonymous = $user_anonymous['address'];
 
 		if ( $type == 'all' ) {
 			$type_snippet = '';
@@ -153,33 +177,50 @@ SQL;
 
 		$transactions_query = <<<TRANSACTIONS
 SELECT
-	adr.time,
-	adr.type,
+	trx.time,
+	CASE
+		WHEN adr.type IS NOT NULL THEN adr.type
+		WHEN anm.address IS NOT NULL THEN 'tip'
+		ELSE 'deposit'
+	END as `type`,
 	adr.post_id,
-	adr.tx_id,
-	adr.rx_id,
+	COALESCE(adr.tx_id, 0) AS `tx_id`,
+	COALESCE(adr.rx_id, {$user}) AS `rx_id`,
 	trx.amount
-	FROM {$this->settings_database['addresses_table']} AS adr
-	INNER JOIN {$this->settings_database['transactions_table']} AS trx
-	ON  trx.address  = adr.address
-	AND trx.category = 'receive'
-	WHERE
+	FROM {$this->settings_database['transactions_table']} AS trx
+	LEFT JOIN {$this->settings_database['addresses_table']} AS adr
+	ON  adr.address  = trx.address
+	LEFT JOIN (
+		SELECT
+			anmpst_mta.meta_value AS `address`
+			FROM wp_posts AS pst
+			LEFT JOIN wp_postmeta as anmpst_mta
+			ON  anmpst_mta.post_id = pst.ID
+			WHERE pst.post_author = {$user}
+			  AND anmpst_mta.meta_key = '_Btc_Tip_Jar_Btc_anonymous'
+	) AS anm
+	ON  anm.address = trx.address
+	WHERE trx.category = 'receive'
+	  AND
 	(
 		adr.tx_id = {$user}
 		OR
 		adr.rx_id = {$user}
+		OR
+		trx.address = '{$user_anonymous}'
+		OR
+		anm.address IS NOT NULL
 	)
 	  {$type_snippet}
 	  AND
 	(
-		adr.time >= '{$first}'
+		trx.time >= '{$first}'
 		AND
-		adr.time <= '{$final}'
+		trx.time <= '{$final}'
 	);
 TRANSACTIONS;
 
-		$transactions = $this->wpdb->get_results( $transactions_query, ARRAY_A );
-		return $transactions;
+		return $this->wpdb->get_results( $transactions_query, ARRAY_A );
 	}
 }
 

@@ -12,16 +12,16 @@ class Btc_Tip_Jar_User {
 		$this->tip_jar = $tip_jar;
 
 		require_once( 'btc-tip-jar-user-overview.php' );
-		$this->overview = new Btc_Tip_Jar_User_Overview( $this );
+		$this->overview = new Btc_Tip_Jar_User_Overview( $this, 'Overview' );
 
 		require_once( 'btc-tip-jar-user-deposit.php' );
-		$this->deposit = new Btc_Tip_Jar_User_Deposit( $this );
+		$this->deposit = new Btc_Tip_Jar_User_Deposit( $this, 'Deposit' );
 
 		require_once( 'btc-tip-jar-user-withdraw.php' );
-		$this->withdraw = new Btc_Tip_Jar_User_Withdraw( $this );
+		$this->withdraw = new Btc_Tip_Jar_User_Withdraw( $this, 'Withdraw' );
 
 		require_once( 'btc-tip-jar-user-transfer.php' );
-		$this->transfer = new Btc_Tip_Jar_User_Transfer( $this );
+		$this->transfer = new Btc_Tip_Jar_User_Transfer( $this, 'Transfer' );
 
 		add_action( 'admin_menu', array( &$this, 'do_menu' ) );
 
@@ -115,6 +115,7 @@ class Btc_Tip_Jar_User {
 				'decimals' => $this->tip_jar->menu->settings['decimals'],
 			)
 		);
+
 	}
 	public function print_script() {
 		wp_enqueue_script( get_class() );
@@ -123,6 +124,31 @@ class Btc_Tip_Jar_User {
 	public function print_style() {
 		wp_enqueue_style( get_class() );
 	}
+}
+
+abstract class Btc_Tip_Jar_User_Page {
+	protected $user;
+
+	protected $title;
+
+	public function __construct( $user, $title ) {
+		$this->user  = $user;
+		$this->title = $title;
+	}
+
+	public function do_page() {
+		echo '<div id="wrap">';
+		screen_icon();
+		echo '<h1>Bitcoin Tip Jar - ';
+		echo esc_html( $this->title );
+		echo '</h1>' . "\n";
+
+		$this->do_page_body();
+
+		echo '</div>';
+	}
+
+	abstract public function do_page_body();
 }
 
 ?>

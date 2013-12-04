@@ -1,44 +1,54 @@
 <?php
 
-class Btc_Tip_Jar_User_Overview {
-	private $user;
+class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
+	private $table;
 
-	public function __construct( $user ) {
-		$this->user = $user;
-
+	public function do_page_body() {
 		$this->table = new Btc_Tip_Jar_User_History_Table();
-	}
-	public function do_page() {
-
-		echo '<div id="wrap">';
-		screen_icon();
-		echo '<h1>Bitcoin Tip Jar - Overview</h1>';
 
 		$this->table->get_transactions( $this->get_transactions() );
 
 		$this->table->prepare_items();
 		$this->table->display();
-
-		echo '</div>';
 	}
 	public function get_transactions() {
 		$transactions = $this->user->tip_jar->database->get_transactions(
 			1,
-			'tip',
+			'all',
 			'2013-01-01',
 			'2014-01-01'
 		);
 
 		foreach ( $transactions as &$transaction ) {
-			if ( $transaction['type'] == 'tip' ) {
+			switch ( $transaction['type'] ) {
+			case 'tip':
 				$tip_post = get_post( $transaction['post_id'] );
-				$transaction['title'] = $tip_post->post_title;
-				$transaction['link']  = get_permalink( $transaction['post_id'] );
-			} else {
-				$transaction['title'] = 'Non-Tip';
+				if ( $transaction['tx_id'] == 0 ) {
+					$transaction['title'] = 'Anonymous Tip';
+				} else {
+					$link = get_permalink( $transaction['post_id'] );
+					$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
+					$transaction['title'] = $title;
+				}
+				break;
+			case 'deposit':
+				$link = menu_page_url( 'Btc_Tip_Jar_User_deposit', false );
+				$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
+				$transaction['title'] = $title;
+				break;
+			case 'withdrawal':
+				$link = menu_page_url( 'Btc_Tip_Jar_User_withdraw', false );
+				$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
+				$transaction['title'] = $title;
+				break;
 			}
 
-			$tx_user = get_user_meta( $transaction['tx_id'], 'nickname', true );
+			if ( $transaction['tx_id'] == 0 ) {
+				$tx_user = 'Anonymous';
+			} else {
+				$tx_user = get_user_meta( $transaction['tx_id'], 'nickname', true );
+			}
+
 			$rx_user = get_user_meta( $transaction['rx_id'], 'nickname', true );
 
 			$transaction['tx_user'] = $tx_user;
@@ -93,20 +103,11 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 			default:
 				return $item[$column_name];
 			}
-			case 'title':
-				return $this->get_title( $item[$column_name], $item['link'] );
 			case 'amount':
 				$class = get_class() . '_amount';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			default:
 				return $item[$column_name];
-		}
-	}
-	private function get_title( $title, $link ) {
-		if ( empty( $link ) ) {
-			return $title;
-		} else {
-			return "<a href=\"{$link}\">{$title}</a>";
 		}
 	}
 	public function prepare_items() {
@@ -117,7 +118,5 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 	}
 }
-
-
 
 ?>
