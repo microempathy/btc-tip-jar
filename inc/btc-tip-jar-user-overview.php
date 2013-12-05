@@ -12,11 +12,14 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 		$this->table->display();
 	}
 	public function get_transactions() {
+		global $current_user;
+		get_currentuserinfo();
+
 		$transactions = $this->user->tip_jar->database->get_transactions(
-			1,
+			$current_user->ID,
 			'all',
-			'2013-01-01',
-			'2014-01-01'
+			'2000-01-01',
+			'2020-01-01'
 		);
 
 		foreach ( $transactions as &$transaction ) {
@@ -33,12 +36,12 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 				break;
 			case 'deposit':
 				$link = menu_page_url( 'Btc_Tip_Jar_User_deposit', false );
-				$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
+				$title = "<a href=\"{$link}\">Deposit</a>";
 				$transaction['title'] = $title;
 				break;
 			case 'withdrawal':
 				$link = menu_page_url( 'Btc_Tip_Jar_User_withdraw', false );
-				$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
+				$title = "<a href=\"{$link}\">Withdrawal</a>";
 				$transaction['title'] = $title;
 				break;
 			}

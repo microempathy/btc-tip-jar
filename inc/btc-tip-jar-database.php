@@ -184,7 +184,11 @@ SELECT
 		ELSE 'deposit'
 	END as `type`,
 	adr.post_id,
-	COALESCE(adr.tx_id, 0) AS `tx_id`,
+	CASE
+		WHEN adr.tx_id IS NOT NULL THEN adr.tx_id
+		WHEN anm.address IS NOT NULL THEN 0
+		ELSE {$user}
+	END AS `tx_id`,
 	COALESCE(adr.rx_id, {$user}) AS `rx_id`,
 	trx.amount
 	FROM {$this->settings_database['transactions_table']} AS trx
@@ -217,7 +221,8 @@ SELECT
 		trx.time >= '{$first}'
 		AND
 		trx.time <= '{$final}'
-	);
+	)
+	ORDER BY trx.time DESC;
 TRANSACTIONS;
 
 		return $this->wpdb->get_results( $transactions_query, ARRAY_A );

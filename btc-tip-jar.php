@@ -10,9 +10,9 @@
  */
 
 class Btc_Tip_Jar {
-	public $database;
-	public $menu;
-	private $btc;
+	public  $database;
+	public  $menu;
+	public  $btc;
 
 	private $settings;
 	private $settings_menu;
@@ -142,14 +142,14 @@ class Btc_Tip_Jar {
 		get_currentuserinfo();
 
 		if ( is_user_logged_in() ) {
-			$qr_url = $this->get_qr_url(
+			$qr_url = $this->get_tip_qr_url(
 				$post->post_name,
 				$post->ID,
 				$post->post_author,
 				$current_user->ID
 			);
 		} else {
-			$qr_url = $this->get_qr_url(
+			$qr_url = $this->get_tip_qr_url(
 				$post->post_name,
 				$post->ID,
 				$post->post_author,
@@ -200,8 +200,7 @@ HTML;
 
 		return $content;
 	}
-	public function get_qr_url( $label, $post_id, $author_id, $user_id ) {
-		require_once( 'lib/phpqrcode/qrlib.php' );
+	public function get_tip_qr_url( $label, $post_id, $author_id, $user_id ) {
 
 		if ( $user_id ) {
 			$address = $this->btc->get_post_address_user(
@@ -215,6 +214,11 @@ HTML;
 				$author_id
 			);
 		}
+
+		return $this->get_qr_url( $address, $label );
+	}
+	public function get_qr_url( $address, $label ) {
+		require_once( 'lib/phpqrcode/qrlib.php' );
 
 		$filename = 'btc-tip-jar-' . $address . '.png';
 		$path_url = plugins_url( '/lib/phpqrcode/cache/codes/', __FILE__ );
