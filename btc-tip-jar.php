@@ -10,6 +10,8 @@
  */
 
 class Btc_Tip_Jar {
+	public $prefix = 'Btc_Tip_Jar';
+
 	public  $database;
 	public  $menu;
 	public  $btc;
@@ -26,8 +28,8 @@ class Btc_Tip_Jar {
 			'lastblock'   => false,
 			'fx_rate_url' => 'blockchain.info/ticker',
 		);
-		$this->settings = get_option( get_class(), $settings );
-		update_option( get_class(), $this->settings );
+		$this->settings = get_option( $this->prefix, $settings );
+		update_option( $this->prefix, $this->settings );
 
 		// admin menu functionality
 		$settings_menu = array(
@@ -42,23 +44,26 @@ class Btc_Tip_Jar {
 		);
 
 		$this->settings_menu = get_option(
-			get_class() . '_Menu', $settings_menu
+			$this->prefix . '_Menu', $settings_menu
 		);
 
 		// user interface
 		require_once( 'inc/btc-tip-jar-menu.php' );
-		$this->menu = new Btc_Tip_Jar_Menu( $this->settings_menu );
+		$this->menu = new Btc_Tip_Jar_Menu( $this->prefix, $this->settings_menu );
 
 		// database functionality
 		require_once( 'inc/btc-tip-jar-database.php' );
 		$this->database = new Btc_Tip_Jar_Database(
-			$this->settings, $this->settings_menu
+			$this->prefix, $this->settings, $this->settings_menu
 		);
 
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
 		$this->btc = new Btc_Tip_Jar_Btc(
-			$this->settings, $this->settings_menu, $this->database
+			$this->prefix,
+			$this->settings,
+			$this->settings_menu,
+			$this->database
 		);
 
 		// user menus and functionality
@@ -94,12 +99,12 @@ class Btc_Tip_Jar {
 		wp_enqueue_style( 'jquery-ui-smoothness', $url, false, null );
 
 		wp_enqueue_style(
-			get_class(),
+			$this->prefix,
 			plugins_url( '/styles/btc-tip-jar.css', __FILE__ )
 		);
 
 		wp_enqueue_script(
-			get_class(),
+			$this->prefix,
 			plugins_url( '/scripts/btc-tip-jar.js', __FILE__ ),
 			array(
 				'jquery',
@@ -112,7 +117,7 @@ class Btc_Tip_Jar {
 		);
 
 		wp_enqueue_script(
-			get_class() . '_formatCurrency',
+			$this->prefix . '_formatCurrency',
 			plugins_url( '/scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
 			array(
 				'jquery',
@@ -122,8 +127,8 @@ class Btc_Tip_Jar {
 		);
 
 		wp_localize_script(
-			get_class(),
-			get_class(),
+			$this->prefix,
+			$this->prefix,
 			array(
 				'fx_rate_url' => $this->settings['fx_rate_url'],
 				'fx'          => $this->menu->settings['fx'],

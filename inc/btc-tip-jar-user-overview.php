@@ -4,7 +4,7 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 	private $table;
 
 	public function do_page_body() {
-		$this->table = new Btc_Tip_Jar_User_History_Table();
+		$this->table = new Btc_Tip_Jar_User_History_Table( $this->tip_jar );
 
 		$this->table->get_transactions( $this->get_transactions() );
 
@@ -35,12 +35,12 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 				}
 				break;
 			case 'deposit':
-				$link = menu_page_url( 'Btc_Tip_Jar_User_deposit', false );
+				$link = menu_page_url( 'Btc_Tip_Jar_deposit', false );
 				$title = "<a href=\"{$link}\">Deposit</a>";
 				$transaction['title'] = $title;
 				break;
 			case 'withdrawal':
-				$link = menu_page_url( 'Btc_Tip_Jar_User_withdraw', false );
+				$link = menu_page_url( 'Btc_Tip_Jar_withdraw', false );
 				$title = "<a href=\"{$link}\">Withdrawal</a>";
 				$transaction['title'] = $title;
 				break;
@@ -65,7 +65,9 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 }
 
 class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
-	function __construct() {
+	private $tip_jar;
+
+	public function __construct( $tip_jar ) {
 		parent::__construct(
 			array(
 				'singular' => 'Transaction',
@@ -73,6 +75,8 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				'ajax'     => true,
 			)
 		);
+
+		$this->tip_jar = $tip_jar;
 	}
 	public function get_transactions( $transactions ) {
 		$this->items = $transactions;
@@ -107,7 +111,7 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				return $item[$column_name];
 			}
 			case 'amount':
-				$class = get_class() . '_amount';
+				$class = $this->tip_jar->prefix . '_history_table_amount';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			default:
 				return $item[$column_name];

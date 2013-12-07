@@ -1,6 +1,8 @@
 <?php
 
 class Btc_Tip_Jar_Btc {
+	private $prefix;
+
 	private $settings;
 
 	private $settings_menu;
@@ -9,10 +11,11 @@ class Btc_Tip_Jar_Btc {
 
 	private $connect_string;
 
-	public function __construct( $settings, $settings_menu, $database ) {
-		$this->settings = $settings;
+	public function __construct( $prefix, $settings, $settings_menu, $database ) {
+		$this->prefix        = $prefix;
+		$this->settings      = $settings;
 		$this->settings_menu = $settings_menu;
-		$this->database = $database;
+		$this->database      = $database;
 
 		if ( $this->settings_menu['rpcssl'] ) {
 			$schema = 'https';
@@ -81,7 +84,7 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		$this->settings['lastblock'] = $history['lastblock'];
-		update_option( 'Btc_Tip_Jar', $this->settings );
+		update_option( $this->prefix, $this->settings );
 
 		if ( !empty( $history['transactions'] ) ) {
 			$this->database->insert_transactions( $history['transactions'] );
@@ -90,10 +93,10 @@ class Btc_Tip_Jar_Btc {
 	public function get_user_address( $user ) {
 
 		$label  = home_url( '/' );
-		$label .= get_class() . '/' . $user;
+		$label .= $this->prefix . '/' . $user;
 
 		$user_address = get_user_meta(
-			$user, '_' . get_class() . '_account', true
+			$user, '_' . $this->prefix . '_account', true
 		);
 
 		if ( empty( $user_address ) ) {
@@ -105,7 +108,7 @@ class Btc_Tip_Jar_Btc {
 				$user_address['address'] = $getaccountaddress;
 
 				update_user_meta(
-					$user, '_' . get_class() . '_account', $user_address
+					$user, '_' .  $this->prefix . '_account', $user_address
 				);
 
 			} catch( Exception $e ) {
@@ -151,7 +154,7 @@ class Btc_Tip_Jar_Btc {
 		$author_account = $this->get_user_address( $author );
 
 		$anonymous_address = get_post_meta(
-			$post_id, '_' . get_class() . '_anonymous', true
+			$post_id, '_' . $this->prefix . '_anonymous', true
 		);
 
 		if ( empty( $anonymous_address ) ) {
@@ -164,7 +167,7 @@ class Btc_Tip_Jar_Btc {
 			$anonymous_address = $getnewaddress;
 
 			update_post_meta(
-				$post_id, '_' . get_class() . '_anonymous', $anonymous_address
+				$post_id, '_' .  $this->prefix . '_anonymous', $anonymous_address
 			);
 		}
 

@@ -1,11 +1,13 @@
 <?php
 
 class Btc_Tip_Jar_Menu {
+	private $prefix;
 	public $settings;
 
-	public function __construct( $defaults = array() ) {
+	public function __construct( $prefix, $defaults = array() ) {
+		$this->prefix = $prefix;
 
-		$this->settings = get_option( get_class(), $defaults );
+		$this->settings = get_option( $this->prefix . '_Menu', $defaults );
 
 		add_action( 'admin_menu', array( &$this, 'menu' ) );
 		add_action( 'admin_init', array( &$this, 'menu_settings' ) );
@@ -23,15 +25,15 @@ public function menu() {
 
 	}
 	public function menu_settings() {
-		register_setting( get_class(), get_class() );
+		register_setting( $this->prefix, $this->prefix );
 	}
 	public function menu_page() {
 
 		echo '<div class="wrap">';
 		echo '<h2>Bitcoin Tip Jar Settings</h2>';
 		echo '<form method="post" action="options.php">';
-		settings_fields( get_class() );
-		do_settings_fields( get_class(), get_class() );
+		settings_fields( $this->prefix );
+		do_settings_fields( $this->prefix, $this->prefix );
 		echo '<table class="form-table">';
 
 		$this->menu_page_item( 'rpcssl', __( 'Secure socket' ) );
@@ -50,19 +52,19 @@ public function menu() {
 private function menu_page_item( $item, $label ) {
 
 		echo '<tr valign="top">';
-		echo '<th scope="row"><label for="' . get_class() . '[' . $item . ']">' . $label . '</label></th>';
+		echo '<th scope="row"><label for="' . $this->prefix . '[' . $item . ']">' . $label . '</label></th>';
 		echo '<td>';
 
 		if ( $item == 'rpcssl' ) {
 			echo '<input type="checkbox" class="regular-text" ';
-			echo 'name="' . get_class() . '[' . $item . ']" id="' . get_class() . '[' . $item . ']" ';
+			echo 'name="' . $this->prefix . '[' . $item . ']" id="' . $this->prefix . '[' . $item . ']" ';
 			if ( !empty( $this->settings[$item] ) ) {
 				checked( $this->settings[$item] );
 			}
 			echo 'value="1" />';
 		} else {
 			echo '<input type="text" class="regular-text" ';
-			echo 'name="' . get_class() . '[' . $item . ']" id="' . get_class() . '[' . $item . ']" ';
+			echo 'name="' . $this->prefix . '[' . $item . ']" id="' . $this->prefix . '[' . $item . ']" ';
 			echo 'value="' . $this->settings[$item] . '" />';
 		}
 

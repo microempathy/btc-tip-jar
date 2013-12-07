@@ -1,14 +1,17 @@
 <?php
 
 class Btc_Tip_Jar_Database {
+	private $prefix;
 	private $wpdb;
 
 	private $settings;
 	private $settings_menu;
 	private $settings_database;
 
-	public function __construct( $settings, $settings_menu ) {
+	public function __construct( $prefix, $settings, $settings_menu ) {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+		$this->prefix = $prefix;
 
 		global $wpdb;
 		$this->wpdb = $wpdb;
@@ -16,20 +19,23 @@ class Btc_Tip_Jar_Database {
 		$this->settings = $settings;
 		$this->settings_menu = $settings_menu;
 
-		$db_prefix = 'Btc_Tip_Jar';
-		$transactions_table = "{$this->wpdb->base_prefix}{$db_prefix}_transactions";
-		$addresses_table    = "{$this->wpdb->base_prefix}{$db_prefix}_addresses";
+		$transactions_table = "{$this->wpdb->base_prefix}{$prefix}_transactions";
+		$addresses_table    = "{$this->wpdb->base_prefix}{$prefix}_addresses";
 
 		$settings_database = array(
-			'db_prefix'          => $db_prefix,
+			'prefix'          => $prefix,
 			'transactions_table' => $transactions_table,
 			'addresses_table'    => $addresses_table,
 		);
 
-		delete_option( get_class() );
+		delete_option( $this->prefix . '_Database' );
 
-		$this->settings_database = get_option( get_class(), $settings_database );
-		update_option( get_class(), $this->settings_database );
+		$this->settings_database = get_option(
+			$this->prefix . '_Database',
+			$settings_database
+		);
+
+		update_option( $this->prefix . '_Database', $this->settings_database );
 	}
 	public function create_transactions_table() {
 
@@ -42,7 +48,6 @@ CREATE TABLE {$this->settings_database['transactions_table']} (
 	confirmations mediumint(9) DEFAULT 0,
 	address   VARCHAR(64)  NOT NULL,
 	txid      VARCHAR(64)  NOT NULL,
-	block     mediumint(9) NOT NULL,
 	blockhash VARCHAR(64)  NOT NULL,
 	account   varchar(64)  NULL,
 	time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
@@ -117,7 +122,6 @@ SQL;
 				'confirmations' => $transaction['confirmations'],
 				'address'       => $transaction['address'],
 				'txid'          => $transaction['txid'],
-				'block'         => $transaction['block'],
 				'blockhash'     => $transaction['blockhash'],
 				'account'       => $transaction['account'],
 				)
@@ -144,7 +148,7 @@ SQL;
 			$donations = 0.0;
 		}
 
-		$anon_address = get_post_meta( $post_id, '_Btc_Tip_Jar_Btc_anonymous', true );
+		$anon_address = get_post_meta( $post_id, '_Btc_Tip_Jar_anonymous', true );
 
 		$anon_donations_query = <<<SQL
 SELECT
@@ -165,7 +169,7 @@ SQL;
 	public function get_transactions( $user, $type, $first, $final ) {
 
 		$user_anonymous = get_user_meta(
-			$user, '_' . 'Btc_Tip_Jar_Btc_account', true
+			$user, '_' . $this->prefix . '_account', true
 		);
 		$user_anonymous = $user_anonymous['address'];
 
@@ -197,11 +201,11 @@ SELECT
 	LEFT JOIN (
 		SELECT
 			anmpst_mta.meta_value AS `address`
-			FROM wp_posts AS pst
-			LEFT JOIN wp_postmeta as anmpst_mta
+			FROM {$this->wpdb->posts} AS pst
+			LEFT JOIN {$this->wpdb->postmeta} anmpst_mta
 			ON  anmpst_mta.post_id = pst.ID
 			WHERE pst.post_author = {$user}
-			  AND anmpst_mta.meta_key = '_Btc_Tip_Jar_Btc_anonymous'
+			  AND anmpst_mta.meta_key = '_Btc_Tip_Jar_anonymous'
 	) AS anm
 	ON  anm.address = trx.address
 	WHERE trx.category = 'receive'
