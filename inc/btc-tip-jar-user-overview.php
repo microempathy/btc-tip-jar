@@ -21,7 +21,7 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 
 		echo '<span id="Btc_Tip_Jar_balance">';
 		echo 'Balance: ';
-		echo '<span id="Btc_Tip_Jar_balance_amount">';
+		echo '<span class="Btc_Tip_Jar_Fx_format" id="Btc_Tip_Jar_balance_amount">';
 		echo esc_html( $balance );
 		echo '</span>';
 		echo '</span>';
@@ -132,7 +132,10 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				return $item[$column_name];
 			}
 			case 'amount':
-				$class = $this->tip_jar->prefix. '_history_table_amount';
+				$class = 'Btc_Tip_Jar_Fx_format Btc_Tip_Jar_history_table_amount';
+				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
+			case 'balance':
+				$class = 'Btc_Tip_Jar_Fx_format Btc_Tip_Jar_history_table_balance';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			default:
 				return $item[$column_name];

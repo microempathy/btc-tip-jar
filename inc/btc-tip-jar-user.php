@@ -99,6 +99,11 @@ class Btc_Tip_Jar_User {
 		);
 
 		wp_register_script(
+			$this->tip_jar->prefix . '_Fx',
+			plugins_url( '/../scripts/btc-tip-jar-fx.js', __FILE__ )
+		);
+
+		wp_register_script(
 			$this->tip_jar->prefix . '_formatCurrency',
 			plugins_url( '/../scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
 			array(
@@ -116,9 +121,19 @@ class Btc_Tip_Jar_User {
 			)
 		);
 
+		wp_localize_script(
+			$this->tip_jar->prefix . '_Fx',
+			$this->tip_jar->prefix . '_Fx',
+			array(
+				'url' => $this->tip_jar->settings['fx_rate_url'],
+				'fx'  => $this->tip_jar->menu->settings['fx'],
+			)
+		);
+
 	}
 	public function print_script() {
 		wp_enqueue_script( $this->tip_jar->prefix );
+		wp_enqueue_script( $this->tip_jar->prefix . '_Fx' );
 		wp_enqueue_script( $this->tip_jar->prefix . '_formatCurrency' );
 	}
 	public function print_style() {

@@ -16,8 +16,8 @@ class Btc_Tip_Jar {
 	public  $menu;
 	public  $btc;
 
-	private $settings;
-	private $settings_menu;
+	public $settings;
+	public $settings_menu;
 
 	public function __construct() {
 
@@ -26,7 +26,7 @@ class Btc_Tip_Jar {
 			'rpctimeout'  => 2,
 			'list_tx_max' => 999,
 			'lastblock'   => false,
-			'fx_rate_url' => 'blockchain.info/ticker',
+			'fx_rate_url' => 'https://blockchain.info/ticker?cors=true',
 		);
 		$this->settings = get_option( $this->prefix, $settings );
 		update_option( $this->prefix, $this->settings );
@@ -117,6 +117,19 @@ class Btc_Tip_Jar {
 		);
 
 		wp_enqueue_script(
+			$this->prefix . '_Fx',
+			plugins_url( '/scripts/btc-tip-jar-fx.js', __FILE__ ),
+			array(
+				'jquery',
+				'jquery-ui-core',
+				'jquery-ui-button',
+				'jquery-ui-dialog',
+			),
+			false,
+			true
+		);
+
+		wp_enqueue_script(
 			$this->prefix . '_formatCurrency',
 			plugins_url( '/scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
 			array(
@@ -130,11 +143,19 @@ class Btc_Tip_Jar {
 			$this->prefix,
 			$this->prefix,
 			array(
-				'fx_rate_url' => $this->settings['fx_rate_url'],
-				'fx'          => $this->menu->settings['fx'],
-				'decimals'    => $this->menu->settings['decimals'],
+				'decimals' => $this->menu->settings['decimals'],
 			)
 		);
+
+		wp_localize_script(
+			$this->prefix . '_Fx',
+			$this->prefix . '_Fx',
+			array(
+				'url' => $this->settings['fx_rate_url'],
+				'fx'  => $this->menu->settings['fx'],
+			)
+		);
+
 	}
 	public function add_post_tip_jar( $content = '' ) {
 
@@ -184,6 +205,7 @@ class Btc_Tip_Jar {
 		<input
 			type="button"
 			id="Btc_Tip_Jar_tip_jar"
+			class="Btc_Tip_Jar_Fx_format"
 			name="Btc_Tip_Jar_tip_jar"
 			title="Bitcoin Tip This Post"
 			value="Tip This Post"
