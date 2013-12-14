@@ -226,7 +226,7 @@ SELECT
 		AND
 		trx.time <= '{$final}'
 	)
-	ORDER BY trx.time DESC;
+	ORDER BY trx.time ASC;
 TRANSACTIONS;
 
 		return $this->wpdb->get_results( $transactions_query, ARRAY_A );

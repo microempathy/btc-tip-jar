@@ -5,3 +5,12 @@ div.icon32#icon-Btc_Tip_Jar {
 table.wp-list-table {
     max-width: 99%;
 }
+
+span#Btc_Tip_Jar_balance {
+    font-weight: bold;
+}
+
+
+span#Btc_Tip_Jar_balance_amount {
+    font-weight: normal;
+}

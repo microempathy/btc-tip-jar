@@ -127,13 +127,16 @@ class Btc_Tip_Jar_User {
 }
 
 abstract class Btc_Tip_Jar_User_Page {
+	protected $prefix;
+
 	protected $user;
 
 	protected $title;
 
 	public function __construct( $user, $title ) {
-		$this->user  = $user;
-		$this->title = $title;
+		$this->prefix = $user->tip_jar->prefix;
+		$this->user   = $user;
+		$this->title  = $title;
 	}
 
 	public function do_page() {

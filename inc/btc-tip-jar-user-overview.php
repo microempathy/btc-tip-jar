@@ -4,12 +4,29 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 	private $table;
 
 	public function do_page_body() {
-		$this->table = new Btc_Tip_Jar_User_History_Table( $this->tip_jar );
 
+		$this->get_balance();
+
+		$this->table = new Btc_Tip_Jar_User_History_Table( $this->prefix );
 		$this->table->get_transactions( $this->get_transactions() );
 
 		$this->table->prepare_items();
 		$this->table->display();
+	}
+	private function get_balance() {
+		global $current_user;
+		get_currentuserinfo();
+
+		$balance = $this->user->tip_jar->btc->get_user_balance( $current_user->ID );
+
+		echo '<span id="Btc_Tip_Jar_balance">';
+		echo 'Balance: ';
+		echo '<span id="Btc_Tip_Jar_balance_amount">';
+		echo esc_html( $balance );
+		echo '</span>';
+		echo '</span>';
+
+
 	}
 	public function get_transactions() {
 		global $current_user;
@@ -22,6 +39,7 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 			'2020-01-01'
 		);
 
+		$balance = 0.0;
 		foreach ( $transactions as &$transaction ) {
 			switch ( $transaction['type'] ) {
 			case 'tip':
@@ -57,8 +75,11 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 			$transaction['tx_user'] = $tx_user;
 			$transaction['rx_user'] = $rx_user;
 
-			$transaction['balance'] = 'N/A';
+			$balance += $transaction['amount'];
+			$transaction['balance'] = $balance;
 		}
+
+		krsort( $transactions );
 
 		return $transactions;
 	}
@@ -111,7 +132,7 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				return $item[$column_name];
 			}
 			case 'amount':
-				$class = $this->tip_jar->prefix . '_history_table_amount';
+				$class = $this->tip_jar->prefix. '_history_table_amount';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			default:
 				return $item[$column_name];

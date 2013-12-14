@@ -90,10 +90,15 @@ class Btc_Tip_Jar_Btc {
 			$this->database->insert_transactions( $history['transactions'] );
 		}
 	}
+	private function get_account_label( $user ) {
+		$label  = home_url( '/' );
+		$label .= $this->prefix . '/user_' . $user;
+
+		return $label;
+	}
 	public function get_user_address( $user ) {
 
-		$label  = home_url( '/' );
-		$label .= $this->prefix . '/' . $user;
+		$label = $this->get_account_label( $user );
 
 		$user_address = get_user_meta(
 			$user, '_' . $this->prefix . '_account', true
@@ -172,6 +177,19 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		return $anonymous_address;
+	}
+	public function get_user_balance( $user_id ) {
+		$label = $this->get_account_label( $user_id );
+
+		$btc = $this->connect();
+
+		try {
+			$user_balance = $btc->getbalance( $label, 0 );
+			return $user_balance;
+		} catch( Exception $e ) {
+			error_log( $e->getMessage() );
+			return 0.0;
+		}
 	}
 }
 
