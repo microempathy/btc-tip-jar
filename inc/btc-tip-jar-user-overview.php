@@ -7,7 +7,7 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 
 		$this->get_balance();
 
-		$this->table = new Btc_Tip_Jar_User_History_Table( $this->prefix );
+		$this->table = new Btc_Tip_Jar_User_History_Table();
 		$this->table->get_transactions( $this->get_transactions() );
 
 		$this->table->prepare_items();
@@ -19,9 +19,9 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 
 		$balance = $this->user->tip_jar->btc->get_user_balance( $current_user->ID );
 
-		echo '<span id="Btc_Tip_Jar_balance">';
+		echo '<span id="btc-tip-jar_balance">';
 		echo 'Balance: ';
-		echo '<span class="Btc_Tip_Jar_Fx_format" id="Btc_Tip_Jar_balance_amount">';
+		echo '<span class="btc-tip-jar_fx-format" id="btc-tip-jar_balance-amount">';
 		echo esc_html( $balance );
 		echo '</span>';
 		echo '</span>';
@@ -53,12 +53,12 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 				}
 				break;
 			case 'deposit':
-				$link = menu_page_url( 'Btc_Tip_Jar_deposit', false );
+				$link = menu_page_url( 'btc-tip-jar_deposit', false );
 				$title = "<a href=\"{$link}\">Deposit</a>";
 				$transaction['title'] = $title;
 				break;
 			case 'withdrawal':
-				$link = menu_page_url( 'Btc_Tip_Jar_withdraw', false );
+				$link = menu_page_url( 'btc-tip-jar_withdraw', false );
 				$title = "<a href=\"{$link}\">Withdrawal</a>";
 				$transaction['title'] = $title;
 				break;
@@ -86,9 +86,8 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 }
 
 class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
-	private $tip_jar;
 
-	public function __construct( $tip_jar ) {
+	public function __construct() {
 		parent::__construct(
 			array(
 				'singular' => 'Transaction',
@@ -97,7 +96,6 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 			)
 		);
 
-		$this->tip_jar = $tip_jar;
 	}
 	public function get_transactions( $transactions ) {
 		$this->items = $transactions;
@@ -132,10 +130,10 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				return $item[$column_name];
 			}
 			case 'amount':
-				$class = 'Btc_Tip_Jar_Fx_format Btc_Tip_Jar_history_table_amount';
+				$class = 'btc-tip-jar_fx-format btc-tip-jar_history-table-amount';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			case 'balance':
-				$class = 'Btc_Tip_Jar_Fx_format Btc_Tip_Jar_history_table_balance';
+				$class = 'btc-tip-jar_fx-format btc-tip-jar_history-table-balance';
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			default:
 				return $item[$column_name];

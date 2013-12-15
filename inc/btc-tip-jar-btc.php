@@ -1,8 +1,6 @@
 <?php
 
 class Btc_Tip_Jar_Btc {
-	private $prefix;
-
 	private $settings;
 
 	private $settings_menu;
@@ -11,8 +9,7 @@ class Btc_Tip_Jar_Btc {
 
 	private $connect_string;
 
-	public function __construct( $prefix, $settings, $settings_menu, $database ) {
-		$this->prefix        = $prefix;
+	public function __construct( $settings, $settings_menu, $database ) {
 		$this->settings      = $settings;
 		$this->settings_menu = $settings_menu;
 		$this->database      = $database;
@@ -31,6 +28,7 @@ class Btc_Tip_Jar_Btc {
 
 	}
 	public function connect() {
+
 		require_once(
 			plugin_dir_path( __FILE__ )
 			.
@@ -84,7 +82,7 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		$this->settings['lastblock'] = $history['lastblock'];
-		update_option( $this->prefix, $this->settings );
+		update_option( 'btc-tip-jar', $this->settings );
 
 		if ( !empty( $history['transactions'] ) ) {
 			$this->database->insert_transactions( $history['transactions'] );
@@ -92,7 +90,7 @@ class Btc_Tip_Jar_Btc {
 	}
 	private function get_account_label( $user ) {
 		$label  = home_url( '/' );
-		$label .= $this->prefix . '/user_' . $user;
+		$label .= 'btc-tip-jar/user_' . $user;
 
 		return $label;
 	}
@@ -101,7 +99,7 @@ class Btc_Tip_Jar_Btc {
 		$label = $this->get_account_label( $user );
 
 		$user_address = get_user_meta(
-			$user, '_' . $this->prefix . '_account', true
+			$user, 'btc-tip-jar_account', true
 		);
 
 		if ( empty( $user_address ) ) {
@@ -113,7 +111,7 @@ class Btc_Tip_Jar_Btc {
 				$user_address['address'] = $getaccountaddress;
 
 				update_user_meta(
-					$user, '_' .  $this->prefix . '_account', $user_address
+					$user, 'btc-tip-jar_account', $user_address
 				);
 
 			} catch( Exception $e ) {
@@ -159,7 +157,7 @@ class Btc_Tip_Jar_Btc {
 		$author_account = $this->get_user_address( $author );
 
 		$anonymous_address = get_post_meta(
-			$post_id, '_' . $this->prefix . '_anonymous', true
+			$post_id, 'btc-tip-jar_anonymous', true
 		);
 
 		if ( empty( $anonymous_address ) ) {
@@ -172,7 +170,7 @@ class Btc_Tip_Jar_Btc {
 			$anonymous_address = $getnewaddress;
 
 			update_post_meta(
-				$post_id, '_' .  $this->prefix . '_anonymous', $anonymous_address
+				$post_id, 'btc-tip-jar_anonymous', $anonymous_address
 			);
 		}
 

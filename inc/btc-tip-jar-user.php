@@ -33,7 +33,7 @@ class Btc_Tip_Jar_User {
 			'Bitcoin Tip Jar',
 			'Tip Jar',
 			'read',
-			$this->tip_jar->prefix,
+			'btc-tip-jar',
 			array( &$this->overview, 'do_page' ),
 			plugins_url( '../images/btc-tip-jar-16.png', __FILE__ ),
 			71
@@ -69,11 +69,11 @@ class Btc_Tip_Jar_User {
 	}
 	private function do_page( $title, $menu_title, $page_slug, $print ) {
 		$page = add_submenu_page(
-			$this->tip_jar->prefix,
+			'btc-tip-jar',
 			$title,
 			$menu_title,
 			'read',
-			$this->tip_jar->prefix . $page_slug,
+			'btc-tip-jar' . $page_slug,
 			array( &$print, 'do_page' )
 		);
 
@@ -89,22 +89,22 @@ class Btc_Tip_Jar_User {
 	}
 	public function do_scripts_and_styles() {
 		wp_register_style(
-			$this->tip_jar->prefix,
+			'btc-tip-jar',
 			plugins_url( '/../styles/btc-tip-jar-admin.css', __FILE__ )
 		);
 
 		wp_register_script(
-			$this->tip_jar->prefix,
+			'btc-tip-jar',
 			plugins_url( '/../scripts/btc-tip-jar-admin.js', __FILE__ )
 		);
 
 		wp_register_script(
-			$this->tip_jar->prefix . '_Fx',
+			'btc-tip-jar_Fx',
 			plugins_url( '/../scripts/btc-tip-jar-fx.js', __FILE__ )
 		);
 
 		wp_register_script(
-			$this->tip_jar->prefix . '_formatCurrency',
+			'btc-tip-jar_formatCurrency',
 			plugins_url( '/../scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
 			array(
 				'jquery',
@@ -114,16 +114,16 @@ class Btc_Tip_Jar_User {
 		);
 
 		wp_localize_script(
-			$this->tip_jar->prefix,
-			$this->tip_jar->prefix,
+			'btc-tip-jar',
+			'btc-tip-jar',
 			array(
 				'decimals' => $this->tip_jar->menu->settings['decimals'],
 			)
 		);
 
 		wp_localize_script(
-			$this->tip_jar->prefix . '_Fx',
-			$this->tip_jar->prefix . '_Fx',
+			'btc-tip-jar_Fx',
+			'btc-tip-jar_Fx',
 			array(
 				'url' => $this->tip_jar->settings['fx_rate_url'],
 				'fx'  => $this->tip_jar->menu->settings['fx'],
@@ -132,26 +132,23 @@ class Btc_Tip_Jar_User {
 
 	}
 	public function print_script() {
-		wp_enqueue_script( $this->tip_jar->prefix );
-		wp_enqueue_script( $this->tip_jar->prefix . '_Fx' );
-		wp_enqueue_script( $this->tip_jar->prefix . '_formatCurrency' );
+		wp_enqueue_script( 'btc-tip-jar' );
+		wp_enqueue_script( 'btc-tip-jar_Fx' );
+		wp_enqueue_script( 'btc-tip-jar_formatCurrency' );
 	}
 	public function print_style() {
-		wp_enqueue_style( $this->tip_jar->prefix );
+		wp_enqueue_style( 'btc-tip-jar' );
 	}
 }
 
 abstract class Btc_Tip_Jar_User_Page {
-	protected $prefix;
-
 	protected $user;
 
 	protected $title;
 
 	public function __construct( $user, $title ) {
-		$this->prefix = $user->tip_jar->prefix;
-		$this->user   = $user;
-		$this->title  = $title;
+		$this->user  = $user;
+		$this->title = $title;
 	}
 
 	public function do_page() {

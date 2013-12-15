@@ -1,13 +1,11 @@
 <?php
 
 class Btc_Tip_Jar_Menu {
-	private $prefix;
 	public $settings;
 
-	public function __construct( $prefix, $defaults = array() ) {
-		$this->prefix = $prefix;
+	public function __construct( $defaults = array() ) {
 
-		$this->settings = get_option( $this->prefix . '_Menu', $defaults );
+		$this->settings = get_option( 'btc-tip-jar_options', $defaults );
 
 		add_action( 'admin_menu', array( &$this, 'menu' ) );
 		add_action( 'admin_init', array( &$this, 'menu_settings' ) );
@@ -25,15 +23,15 @@ public function menu() {
 
 	}
 	public function menu_settings() {
-		register_setting( $this->prefix, $this->prefix );
+		register_setting( 'btc-tip-jar_options', 'btc-tip-jar_options' );
 	}
 	public function menu_page() {
 
 		echo '<div class="wrap">';
 		echo '<h2>Bitcoin Tip Jar Settings</h2>';
 		echo '<form method="post" action="options.php">';
-		settings_fields( $this->prefix );
-		do_settings_fields( $this->prefix, $this->prefix );
+		settings_fields( 'btc-tip-jar_options' );
+		do_settings_fields( 'btc-tip-jar_options', 'btc-tip-jar_options' );
 		echo '<table class="form-table">';
 
 		$this->menu_page_item( 'rpcssl', __( 'Secure socket' ) );
@@ -52,19 +50,19 @@ public function menu() {
 private function menu_page_item( $item, $label ) {
 
 		echo '<tr valign="top">';
-		echo '<th scope="row"><label for="' . $this->prefix . '[' . $item . ']">' . $label . '</label></th>';
+		echo '<th scope="row"><label for="btc-tip-jar_options[' . $item . ']">' . $label . '</label></th>';
 		echo '<td>';
 
 		if ( $item == 'rpcssl' ) {
 			echo '<input type="checkbox" class="regular-text" ';
-			echo 'name="' . $this->prefix . '[' . $item . ']" id="' . $this->prefix . '[' . $item . ']" ';
+			echo 'name="btc-tip-jar_options[' . $item . ']" id="btc-tip-jar_options[' . $item . ']" ';
 			if ( !empty( $this->settings[$item] ) ) {
 				checked( $this->settings[$item] );
 			}
 			echo 'value="1" />';
 		} else {
 			echo '<input type="text" class="regular-text" ';
-			echo 'name="' . $this->prefix . '[' . $item . ']" id="' . $this->prefix . '[' . $item . ']" ';
+			echo 'name="btc-tip-jar_options[' . $item . ']" id="btc-tip-jar_options[' . $item . ']" ';
 			echo 'value="' . $this->settings[$item] . '" />';
 		}
 

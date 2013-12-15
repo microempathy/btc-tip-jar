@@ -1,17 +1,14 @@
 <?php
 
 class Btc_Tip_Jar_Database {
-	private $prefix;
 	private $wpdb;
 
 	private $settings;
 	private $settings_menu;
 	private $settings_database;
 
-	public function __construct( $prefix, $settings, $settings_menu ) {
+	public function __construct( $settings, $settings_menu ) {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-		$this->prefix = $prefix;
 
 		global $wpdb;
 		$this->wpdb = $wpdb;
@@ -19,23 +16,22 @@ class Btc_Tip_Jar_Database {
 		$this->settings = $settings;
 		$this->settings_menu = $settings_menu;
 
-		$transactions_table = "{$this->wpdb->base_prefix}{$prefix}_transactions";
-		$addresses_table    = "{$this->wpdb->base_prefix}{$prefix}_addresses";
+		$transactions_table = "{$this->wpdb->base_prefix}btc_tip_jar_transactions";
+		$addresses_table    = "{$this->wpdb->base_prefix}btc_tip_jar_addresses";
 
 		$settings_database = array(
-			'prefix'          => $prefix,
 			'transactions_table' => $transactions_table,
 			'addresses_table'    => $addresses_table,
 		);
 
-		delete_option( $this->prefix . '_Database' );
+		delete_option( 'btc-tip-jar_database' );
 
 		$this->settings_database = get_option(
-			$this->prefix . '_Database',
+			'btc-tip-jar_database',
 			$settings_database
 		);
 
-		update_option( $this->prefix . '_Database', $this->settings_database );
+		update_option( 'btc-tip-jar_database', $this->settings_database );
 	}
 	public function create_transactions_table() {
 
@@ -148,7 +144,7 @@ SQL;
 			$donations = 0.0;
 		}
 
-		$anon_address = get_post_meta( $post_id, '_Btc_Tip_Jar_anonymous', true );
+		$anon_address = get_post_meta( $post_id, 'btc-tip-jar_anonymous', true );
 
 		$anon_donations_query = <<<SQL
 SELECT
@@ -169,7 +165,7 @@ SQL;
 	public function get_transactions( $user, $type, $first, $final ) {
 
 		$user_anonymous = get_user_meta(
-			$user, '_' . $this->prefix . '_account', true
+			$user, 'btc-tip-jar_account', true
 		);
 		$user_anonymous = $user_anonymous['address'];
 
@@ -205,7 +201,7 @@ SELECT
 			LEFT JOIN {$this->wpdb->postmeta} anmpst_mta
 			ON  anmpst_mta.post_id = pst.ID
 			WHERE pst.post_author = {$user}
-			  AND anmpst_mta.meta_key = '_Btc_Tip_Jar_anonymous'
+			  AND anmpst_mta.meta_key = 'btc-tip-jar_anonymous'
 	) AS anm
 	ON  anm.address = trx.address
 	WHERE trx.category = 'receive'

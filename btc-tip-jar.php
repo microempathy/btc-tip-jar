@@ -10,8 +10,6 @@
  */
 
 class Btc_Tip_Jar {
-	public $prefix = 'Btc_Tip_Jar';
-
 	public  $database;
 	public  $menu;
 	public  $btc;
@@ -28,8 +26,8 @@ class Btc_Tip_Jar {
 			'lastblock'   => false,
 			'fx_rate_url' => 'https://blockchain.info/ticker?cors=true',
 		);
-		$this->settings = get_option( $this->prefix, $settings );
-		update_option( $this->prefix, $this->settings );
+		$this->settings = get_option( 'btc-tip-jar', $settings );
+		update_option( 'btc-tip-jar', $this->settings );
 
 		// admin menu functionality
 		$settings_menu = array(
@@ -44,23 +42,23 @@ class Btc_Tip_Jar {
 		);
 
 		$this->settings_menu = get_option(
-			$this->prefix . '_Menu', $settings_menu
+			'btc-tip-jar_options', $settings_menu
 		);
 
 		// user interface
 		require_once( 'inc/btc-tip-jar-menu.php' );
-		$this->menu = new Btc_Tip_Jar_Menu( $this->prefix, $this->settings_menu );
+		$this->menu = new Btc_Tip_Jar_Menu( $this->settings_menu );
 
 		// database functionality
 		require_once( 'inc/btc-tip-jar-database.php' );
 		$this->database = new Btc_Tip_Jar_Database(
-			$this->prefix, $this->settings, $this->settings_menu
+			$this->settings,
+			$this->settings_menu
 		);
 
 		// bitcoin functionality
 		require_once( 'inc/btc-tip-jar-btc.php' );
 		$this->btc = new Btc_Tip_Jar_Btc(
-			$this->prefix,
 			$this->settings,
 			$this->settings_menu,
 			$this->database
@@ -99,12 +97,12 @@ class Btc_Tip_Jar {
 		wp_enqueue_style( 'jquery-ui-smoothness', $url, false, null );
 
 		wp_enqueue_style(
-			$this->prefix,
+			'btc-tip-jar',
 			plugins_url( '/styles/btc-tip-jar.css', __FILE__ )
 		);
 
 		wp_enqueue_script(
-			$this->prefix,
+			'btc-tip-jar',
 			plugins_url( '/scripts/btc-tip-jar.js', __FILE__ ),
 			array(
 				'jquery',
@@ -117,7 +115,7 @@ class Btc_Tip_Jar {
 		);
 
 		wp_enqueue_script(
-			$this->prefix . '_Fx',
+			'btc-tip-jar_Fx',
 			plugins_url( '/scripts/btc-tip-jar-fx.js', __FILE__ ),
 			array(
 				'jquery',
@@ -130,7 +128,7 @@ class Btc_Tip_Jar {
 		);
 
 		wp_enqueue_script(
-			$this->prefix . '_formatCurrency',
+			'btc-tip-jar_formatCurrency',
 			plugins_url( '/scripts/jquery-formatcurrency/jquery.formatCurrency.js', __FILE__ ),
 			array(
 				'jquery',
@@ -140,16 +138,16 @@ class Btc_Tip_Jar {
 		);
 
 		wp_localize_script(
-			$this->prefix,
-			$this->prefix,
+			'btc-tip-jar',
+			'btc-tip-jar',
 			array(
 				'decimals' => $this->menu->settings['decimals'],
 			)
 		);
 
 		wp_localize_script(
-			$this->prefix . '_Fx',
-			$this->prefix . '_Fx',
+			'btc-tip-jar_Fx',
+			'btc-tip-jar_Fx',
 			array(
 				'url' => $this->settings['fx_rate_url'],
 				'fx'  => $this->menu->settings['fx'],
@@ -203,18 +201,18 @@ class Btc_Tip_Jar {
 <div class="sharedaddy">
 	<div class="sd-block">
 		<input
-			type="button"
-			id="Btc_Tip_Jar_tip_jar"
-			class="Btc_Tip_Jar_Fx_format"
-			name="Btc_Tip_Jar_tip_jar"
-			title="Bitcoin Tip This Post"
-			value="Tip This Post"
-			data-btc="{$donated}"
+			type     = "button"
+			id       = "btc-tip-jar_tip-jar"
+			class    = "btc-tip-jar_Fx-format"
+			name     = "btc-tip-jar_tip-jar"
+			title    = "Bitcoin Tip This Post"
+			value    = "Tip This Post"
+			data-btc = "{$donated}"
 			/>
 	</div>
 </div>
 
-<div id="Btc_Tip_Jar_dialog" title="Bitcoin Tip Jar">
+<div id="btc-tip-jar_dialog" title="Bitcoin Tip Jar">
 {$before}
 <hr />
 		<img src="{$qr_url}" />

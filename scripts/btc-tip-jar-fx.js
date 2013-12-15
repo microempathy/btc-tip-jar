@@ -7,14 +7,14 @@ jQuery( document ).ready(function( $ ) {
 function get_fx_rates() {
 
 	jQuery.ajax({
-		url: Btc_Tip_Jar_Fx.url,
+		url: btc_tip_jar_fx.url,
 		dataType: 'json',
 		crossDomain: true,
 		jsonpCallback: 'MyJSONPCallback',
 		success: function(data){
-			Btc_Tip_Jar_Fx.fx_rates = data;
+			btc_tip_jar_fx.fx_rates = data;
 
-			jQuery('.Btc_Tip_Jar_Fx_format').each(function(i, o) {
+			jQuery('.btc-tip-jar_fx-format').each(function(i, o) {
 				bitcoin_format(o);
 			});
 
@@ -34,12 +34,12 @@ function bitcoin_format(o) {
 		btc = o.text();
 	}
 
-	var fx  = Btc_Tip_Jar_Fx.fx_rates[Btc_Tip_Jar_Fx.fx]['15m'];
+	var fx  = btc_tip_jar_fx.fx_rates[btc_tip_jar_fx.fx]['15m'];
 
 	var fx_amount = jQuery.getFormattedCurrency(
 		btc * fx,
 		{
-			symbol: Btc_Tip_Jar_Fx.fx_rates[Btc_Tip_Jar_Fx.fx].symbol,
+			symbol: btc_tip_jar_fx.fx_rates[btc_tip_jar_fx.fx].symbol,
 		}
 	);
 
@@ -47,11 +47,12 @@ function bitcoin_format(o) {
 		btc,
 		{
 			symbol: "\u0e3f",
-			roundToDecimalPlace: Btc_Tip_Jar.decimals,
+			roundToDecimalPlace: btc_tip_jar.decimals,
 		}
 	);
 
 	if( btc > 0 ) {
+
 		var amount =
 			btc_amount
 			+
@@ -62,6 +63,7 @@ function bitcoin_format(o) {
 		} else {
 			o.text(amount);
 		}
+
 	}
 
 }

@@ -1,4 +1,4 @@
-div.icon32#icon-Btc_Tip_Jar {
+div.icon32#icon-btc-tip-jar {
     background-image: url( '../images/btc-tip-jar-32.png' );
 }
 
@@ -6,11 +6,11 @@ table.wp-list-table {
     max-width: 99%;
 }
 
-span#Btc_Tip_Jar_balance {
+span#btc-tip-jar_balance {
     font-weight: bold;
 }
 
 
-span#Btc_Tip_Jar_balance_amount {
+span#btc-tip-jar_balance-amount {
     font-weight: normal;
 }

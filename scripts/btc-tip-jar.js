@@ -1,14 +1,14 @@
 jQuery( document ).ready(function( $ ) {
 
-	$( "#Btc_Tip_Jar_dialog" )
+	$( "#btc-tip-jar_dialog" )
 	.dialog()
 	.dialog( "close" );
 
-	$( "#Btc_Tip_Jar_tip_jar" )
+	$( "#btc-tip-jar_tip-jar" )
 	.button()
 	.click(function( event ) {
 		event.preventDefault();
-		$( "#Btc_Tip_Jar_dialog" ).dialog( "open" );
+		$( "#btc-tip-jar_dialog" ).dialog( "open" );
 	});
 
 });

@@ -14,7 +14,7 @@ class Btc_Tip_Jar_User_Deposit extends Btc_Tip_Jar_User_Page {
 		$url   = $this->user->tip_jar->get_qr_url( $address, $label );
 
 		echo wp_kses(
-			"<img src=\"{$url}\" class=\"Btc_Tip_Jar_deposit_qr\"><br />",
+			"<img src=\"{$url}\" class=\"btc-tip-jar_deposit_qr\"><br />",
 			array(
 				'img' => array( 'src' => array(), 'class' => array(), ),
 				'br' => array(),
