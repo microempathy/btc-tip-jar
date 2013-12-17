@@ -164,6 +164,20 @@ abstract class Btc_Tip_Jar_User_Page {
 
 		echo '</div>';
 	}
+	protected function get_balance() {
+		global $current_user;
+		get_currentuserinfo();
+
+		$balance = $this->user->tip_jar->btc->get_user_balance( $current_user->ID );
+
+		echo '<span id="btc-tip-jar_balance">';
+		printf( __( 'Balance: ' ) );
+		echo '<span class="btc-tip-jar_fx-format" id="btc-tip-jar_balance-amount">';
+		echo esc_html( $balance );
+		echo '</span>';
+		echo '</span>';
+
+	}
 
 	abstract public function do_page_body();
 }

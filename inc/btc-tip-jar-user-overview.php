@@ -13,21 +13,6 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 		$this->table->prepare_items();
 		$this->table->display();
 	}
-	private function get_balance() {
-		global $current_user;
-		get_currentuserinfo();
-
-		$balance = $this->user->tip_jar->btc->get_user_balance( $current_user->ID );
-
-		echo '<span id="btc-tip-jar_balance">';
-		echo 'Balance: ';
-		echo '<span class="btc-tip-jar_fx-format" id="btc-tip-jar_balance-amount">';
-		echo esc_html( $balance );
-		echo '</span>';
-		echo '</span>';
-
-
-	}
 	public function get_transactions() {
 		global $current_user;
 		get_currentuserinfo();

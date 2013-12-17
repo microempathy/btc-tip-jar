@@ -24,8 +24,6 @@ class Btc_Tip_Jar_Database {
 			'addresses_table'    => $addresses_table,
 		);
 
-		delete_option( 'btc-tip-jar_database' );
-
 		$this->settings_database = get_option(
 			'btc-tip-jar_database',
 			$settings_database

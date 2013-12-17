@@ -6,7 +6,7 @@
  * Text Domain: btc-tip-jar
  * Version:     0.1
  * Author:      @wikitopian
- * Author URI:  http://www.swarmstrategies.com/matt
+ * Author URI:  http://www.github.com/wikitopian
  * License:     LGPLv3
  */
 
@@ -21,6 +21,7 @@ class Btc_Tip_Jar {
 	public function __construct() {
 
 		$settings = array(
+			'version'     => '0.1',
 			'debug'       => false,
 			'rpctimeout'  => 2,
 			'list_tx_max' => 999,
@@ -79,12 +80,28 @@ class Btc_Tip_Jar {
 			array( &$this->database, 'create_addresses_table' )
 		);
 
+		add_filter(
+			'plugin_action_links',
+			array( &$this, 'do_settings_link' ),
+			10,
+			2
+		);
+
 		add_action(
 			'wp_enqueue_scripts',
 			array( &$this, 'do_scripts_and_styles' )
 		);
 
 		add_filter( 'the_content', array( &$this, 'add_post_tip_jar' ) );
+	}
+	public function do_settings_link( $links, $file ) {
+		if ( $file == 'btc-tip-jar/btc-tip-jar.php' ) {
+			$url  = menu_page_url( 'btc-tip-jar/inc/btc-tip-jar-menu.php', false );
+			$link = sprintf( '<a href="%s">%s</a>', esc_url( $url ), __( 'Settings' ) );
+			array_unshift( $links, $link );
+		}
+
+		return $links;
 	}
 	public function do_scripts_and_styles() {
 
