@@ -98,12 +98,12 @@ class Btc_Tip_Jar {
 		wp_enqueue_style( 'jquery-ui-smoothness', $url, false, null );
 
 		wp_enqueue_style(
-			'btc-tip-jar',
+			'btc_tip_jar',
 			plugins_url( '/styles/btc-tip-jar.css', __FILE__ )
 		);
 
 		wp_enqueue_script(
-			'btc-tip-jar',
+			'btc_tip_jar',
 			plugins_url( '/scripts/btc-tip-jar.js', __FILE__ ),
 			array(
 				'jquery',
@@ -116,7 +116,7 @@ class Btc_Tip_Jar {
 		);
 
 		wp_enqueue_script(
-			'btc-tip-jar_Fx',
+			'btc_tip_jar_fx',
 			plugins_url( '/scripts/btc-tip-jar-fx.js', __FILE__ ),
 			array(
 				'jquery',
@@ -139,16 +139,16 @@ class Btc_Tip_Jar {
 		);
 
 		wp_localize_script(
-			'btc-tip-jar',
-			'btc-tip-jar',
+			'btc_tip_jar',
+			'btc_tip_jar',
 			array(
 				'decimals' => $this->menu->settings['decimals'],
 			)
 		);
 
 		wp_localize_script(
-			'btc-tip-jar_Fx',
-			'btc-tip-jar_Fx',
+			'btc_tip_jar_fx',
+			'btc_tip_jar_fx',
 			array(
 				'url' => $this->settings['fx_rate_url'],
 				'fx'  => $this->menu->settings['fx'],
@@ -204,7 +204,7 @@ class Btc_Tip_Jar {
 		<input
 			type     = "button"
 			id       = "btc-tip-jar_tip-jar"
-			class    = "btc-tip-jar_Fx-format"
+			class    = "btc-tip-jar_fx-format"
 			name     = "btc-tip-jar_tip-jar"
 			title    = "Bitcoin Tip This Post"
 			value    = "Tip This Post"
