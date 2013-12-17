@@ -168,14 +168,14 @@ class Btc_Tip_Jar {
 
 		if ( is_user_logged_in() ) {
 			$qr_url = $this->get_tip_qr_url(
-				$post->post_name,
+				'donation-to-' . $post->post_name,
 				$post->ID,
 				$post->post_author,
 				$current_user->ID
 			);
 		} else {
 			$qr_url = $this->get_tip_qr_url(
-				$post->post_name,
+				'donation-to-' . $post->post_name,
 				$post->ID,
 				$post->post_author,
 				false
@@ -252,7 +252,7 @@ HTML;
 
 		if ( !file_exists( $path . $filename ) ) {
 			QRcode::png(
-				"bitcoin:{$address}?label=donation-to-{$label}",
+				"bitcoin:{$address}?label={$label}",
 				$path . $filename,
 				QR_ECLEVEL_H
 			);

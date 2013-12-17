@@ -14,7 +14,7 @@ class Btc_Tip_Jar_User_Deposit extends Btc_Tip_Jar_User_Page {
 
 		$address = $this->get_address( $current_user->ID );
 
-		$label = 'deposit-for-' . $current_user->login;
+		$label = 'deposit-for-' . $current_user->user_login;
 		$url   = $this->user->tip_jar->get_qr_url( $address, $label );
 
 		echo wp_kses(
