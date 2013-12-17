@@ -3,6 +3,7 @@
  * Plugin Name: Bitcoin Tip Jar
  * Plugin URI:  https://bitbucket.org/wikitopian/btc-tip-jar
  * Description: Easily tip specific posts with bitcoins.
+ * Text Domain: btc-tip-jar
  * Version:     0.1
  * Author:      @wikitopian
  * Author URI:  http://www.swarmstrategies.com/matt

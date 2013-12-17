@@ -45,7 +45,7 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 			case 'tip':
 				$tip_post = get_post( $transaction['post_id'] );
 				if ( $transaction['tx_id'] == 0 ) {
-					$transaction['title'] = 'Anonymous Tip';
+					$transaction['title'] = __( 'Anonymous Tip', 'btc-tip-jar' );
 				} else {
 					$link = get_permalink( $transaction['post_id'] );
 					$title = "<a href=\"{$link}\">{$tip_post->post_title}</a>";
@@ -54,18 +54,28 @@ class Btc_Tip_Jar_User_Overview extends Btc_Tip_Jar_User_Page {
 				break;
 			case 'deposit':
 				$link = menu_page_url( 'btc-tip-jar_deposit', false );
-				$title = "<a href=\"{$link}\">Deposit</a>";
+
+				$title = sprintf(
+					"<a href=\"{$link}\">%s</a>",
+					__( 'Deposit' , 'btc-tip-jar' )
+				);
+
 				$transaction['title'] = $title;
 				break;
 			case 'withdrawal':
 				$link = menu_page_url( 'btc-tip-jar_withdraw', false );
-				$title = "<a href=\"{$link}\">Withdrawal</a>";
+
+				$title = sprintf(
+					"<a href=\"{$link}\">%s</a>",
+					__( 'Withdrawal', 'btc-tip-jar' )
+				);
+
 				$transaction['title'] = $title;
 				break;
 			}
 
 			if ( $transaction['tx_id'] == 0 ) {
-				$tx_user = 'Anonymous';
+				$tx_user = __( 'Anonymous' );
 			} else {
 				$tx_user = get_user_meta( $transaction['tx_id'], 'nickname', true );
 			}
@@ -90,8 +100,8 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 	public function __construct() {
 		parent::__construct(
 			array(
-				'singular' => 'Transaction',
-				'plural'   => 'Transactions',
+				'singular' => __( 'Transaction' ),
+				'plural'   => __( 'Transactions' ),
 				'ajax'     => true,
 			)
 		);
@@ -102,13 +112,13 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 	}
 	public function get_columns() {
 		return array(
-			'time'    => 'Date',
-			'type'    => 'Type',
-			'title'   => 'Title',
-			'tx_user' => 'From',
-			'rx_user' => 'To',
-			'amount'  => 'Amount',
-			'balance' => 'Balance',
+			'time'    => __( 'Date',    'btc-tip-jar' ),
+			'type'    => __( 'Type',    'btc-tip-jar' ),
+			'title'   => __( 'Title',   'btc-tip-jar' ),
+			'tx_user' => __( 'From',    'btc-tip-jar' ),
+			'rx_user' => __( 'To',      'btc-tip-jar' ),
+			'amount'  => __( 'Amount',  'btc-tip-jar' ),
+			'balance' => __( 'Balance', 'btc-tip-jar' ),
 		);
 	}
 	function column_default( $item, $column_name ) {
@@ -119,13 +129,13 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 		case 'type':
 			switch ( $item[$column_name] ) {
 			case 'tip':
-				return 'Tip';
+				return __( 'Tip', 'btc-tip-jar' );
 			case 'withdrawal':
-				return 'Withdrawal';
+				return __( 'Withdrawal', 'btc-tip-jar' );
 			case 'deposit':
-				return 'Deposit';
+				return __( 'Deposit', 'btc-tip-jar' );
 			case 'transfer':
-				return 'Transfer';
+				return __( 'Transfer', 'btc-tip-jar' );
 			default:
 				return $item[$column_name];
 			}

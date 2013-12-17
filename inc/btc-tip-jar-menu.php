@@ -14,8 +14,8 @@ class Btc_Tip_Jar_Menu {
 public function menu() {
 
 		add_options_page(
-			'Bitcoin Tip Jar',
-			'Bitcoin Tip Jar',
+			__( 'Bitcoin Tip Jar', 'btc-tip-jar' ),
+			__( 'Bitcoin Tip Jar', 'btc-tip-jar' ),
 			'manage_options',
 			__FILE__,
 			array( &$this, 'menu_page' )
@@ -28,20 +28,51 @@ public function menu() {
 	public function menu_page() {
 
 		echo '<div class="wrap">';
-		echo '<h2>Bitcoin Tip Jar Settings</h2>';
+		printf( '<h2>%s</h2>', __( 'Bitcoin Tip Jar Settings', 'btc-tip-jar' ) );
 		echo '<form method="post" action="options.php">';
 		settings_fields( 'btc-tip-jar_options' );
 		do_settings_fields( 'btc-tip-jar_options', 'btc-tip-jar_options' );
 		echo '<table class="form-table">';
 
-		$this->menu_page_item( 'rpcssl', __( 'Secure socket' ) );
-		$this->menu_page_item( 'rpcconnect', __( 'Address' ) );
-		$this->menu_page_item( 'rpcport', __( 'Port' ) );
-		$this->menu_page_item( 'rpcuser', __( 'Username' ) );
-		$this->menu_page_item( 'rpcpassword', __( 'Password' ) );
-		$this->menu_page_item( 'rpcwallet', __( 'Wallet Password' ) );
-		$this->menu_page_item( 'fx', __( 'Conversion Currency' ) );
-		$this->menu_page_item( 'decimals', __( 'Bitcoin Decimals' ) );
+		$this->menu_page_item(
+			'rpcssl',
+			__( 'Secure socket', 'btc-tip-jar'  )
+		);
+
+		$this->menu_page_item(
+			'rpcconnect',
+			__( 'Address', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'rpcport',
+			__( 'Port', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'rpcuser',
+			__( 'Username', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'rpcpassword',
+			__( 'Password', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'rpcwallet',
+			__( 'Wallet Password', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'fx',
+			__( 'Conversion Currency', 'btc-tip-jar' )
+		);
+
+		$this->menu_page_item(
+			'decimals',
+			__( 'Bitcoin Decimals', 'btc-tip-jar' )
+		);
 
 		echo '</table>';
 		submit_button();

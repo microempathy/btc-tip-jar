@@ -5,8 +5,12 @@ class Btc_Tip_Jar_User_Deposit extends Btc_Tip_Jar_User_Page {
 		global $current_user;
 		get_currentuserinfo();
 
-		echo 'Fill and refill your account by sending ';
-		echo 'Bitcoins to the following address...<br />';
+		printf(
+			__(
+				'Fill and refill your account by sending Bitcoins to the following address...<br />',
+				'btc-tip-jar'
+			)
+		);
 
 		$address = $this->get_address( $current_user->ID );
 
@@ -20,7 +24,7 @@ class Btc_Tip_Jar_User_Deposit extends Btc_Tip_Jar_User_Page {
 				'br' => array(),
 			)
 		);
-		echo wp_kses( "Deposit Address: {$address}" );
+		printf( __( 'Deposit Address: %s', 'btc-tip-jar' ), $address );
 	}
 	public function get_address( $user_id ) {
 		$address = $this->user->tip_jar->btc->get_user_address( $user_id );

@@ -30,8 +30,8 @@ class Btc_Tip_Jar_User {
 	public function do_menu() {
 
 		add_menu_page(
-			'Bitcoin Tip Jar',
-			'Tip Jar',
+			__( 'Bitcoin Tip Jar', 'btc-tip-jar' ),
+			__( 'Tip Jar', 'btc-tip-jar' ),
 			'read',
 			'btc-tip-jar',
 			array( &$this->overview, 'do_page' ),
@@ -40,29 +40,29 @@ class Btc_Tip_Jar_User {
 		);
 
 		$this->do_page(
-			'Bitcoin Tip Jar - Overview',
-			'Overview',
+			__( 'Bitcoin Tip Jar - Overview', 'btc-tip-jar' ),
+			__( 'Overview', 'btc-tip-jar' ),
 			'',
 			$this->overview
 		);
 
 		$this->do_page(
-			'Bitcoin Tip Jar - Deposit Bitcoins',
-			'Deposit',
+			__( 'Bitcoin Tip Jar - Deposit Bitcoins', 'btc-tip-jar' ),
+			__( 'Deposit', 'btc-tip-jar' ),
 			'_deposit',
 			$this->deposit
 		);
 
 		$this->do_page(
-			'Bitcoin Tip Jar - Withdraw Bitcoins',
-			'Withdraw',
+			__( 'Bitcoin Tip Jar - Withdraw Bitcoins', 'btc-tip-jar' ),
+			__( 'Withdraw', 'btc-tip-jar' ),
 			'_withdraw',
 			$this->withdraw
 		);
 
 		$this->do_page(
-			'Bitcoin Tip Jar - Transfer Bitcoins',
-			'Transfer',
+			__( 'Bitcoin Tip Jar - Transfer Bitcoins', 'btc-tip-jar' ),
+			__( 'Transfer', 'btc-tip-jar' ),
 			'_transfer',
 			$this->transfer
 		);
@@ -154,9 +154,11 @@ abstract class Btc_Tip_Jar_User_Page {
 	public function do_page() {
 		echo '<div id="wrap">';
 		screen_icon();
-		echo '<h1>Bitcoin Tip Jar - ';
-		echo esc_html( $this->title );
-		echo '</h1>' . "\n";
+
+		printf(
+			__( "<h1>Bitcoin Tip Jar - %s</h1>\n", 'btc-tip-jar' ),
+			esc_html( $this->title )
+		);
 
 		$this->do_page_body();
 
