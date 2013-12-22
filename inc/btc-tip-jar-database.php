@@ -177,6 +177,7 @@ SQL;
 SELECT
 	trx.time,
 	CASE
+		WHEN trx.category = 'send' THEN 'withdrawal'
 		WHEN adr.type IS NOT NULL THEN adr.type
 		WHEN anm.address IS NOT NULL THEN 'tip'
 		ELSE 'deposit'
@@ -188,7 +189,10 @@ SELECT
 		ELSE {$user}
 	END AS `tx_id`,
 	COALESCE(adr.rx_id, {$user}) AS `rx_id`,
-	trx.amount
+	CASE
+		WHEN trx.category = 'send' THEN trx.amount - trx.fee
+		ELSE trx.amount
+	END AS amount
 	FROM {$this->settings_database['transactions_table']} AS trx
 	LEFT JOIN {$this->settings_database['addresses_table']} AS adr
 	ON  adr.address  = trx.address
@@ -202,8 +206,7 @@ SELECT
 			  AND anmpst_mta.meta_key = 'btc-tip-jar_anonymous'
 	) AS anm
 	ON  anm.address = trx.address
-	WHERE trx.category = 'receive'
-	  AND
+	WHERE
 	(
 		adr.tx_id = {$user}
 		OR

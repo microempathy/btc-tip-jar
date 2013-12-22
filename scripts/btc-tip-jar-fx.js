@@ -51,19 +51,15 @@ function bitcoin_format(o) {
 		}
 	);
 
-	if( btc > 0 ) {
+	var amount =
+		btc_amount
+		+
+		' (' + fx_amount + ')';
 
-		var amount =
-			btc_amount
-			+
-			' (' + fx_amount + ')';
-
-		if( o.data('btc') ) {
-			o.val(amount);
-		} else {
-			o.text(amount);
-		}
-
+	if( o.data('btc') ) {
+		o.val(amount);
+	} else {
+		o.text(amount);
 	}
 
 }

@@ -46,6 +46,7 @@ class Btc_Tip_Jar_Btc {
 		}
 
 		try {
+			$this->settings['debug'] = false;
 			$connection = new jsonRPCClient( $this->connect_string, $this->settings['debug'] );
 
 			$connection->walletpassphrase(
@@ -187,6 +188,44 @@ class Btc_Tip_Jar_Btc {
 		} catch( Exception $e ) {
 			error_log( $e->getMessage() );
 			return 0.0;
+		}
+	}
+	public function do_withdrawal( $user, $address, $amount ) {
+		$btc = $this->connect();
+
+		try {
+			$validateaddress = $btc->validateaddress( $address );
+
+			if ( !$validateaddress['isvalid'] ) {
+				return 'INVALID_ADDRESS';
+			} elseif ( $validateaddress['ismine'] ) {
+				return 'INTERNAL_TRANSFER';
+			}
+
+			$label = $this->get_account_label( $user );
+
+			$getbalance = $btc->getbalance( $label );
+
+			if ( $amount > $getbalance ) {
+				return 'OVERDRAFT';
+			}
+
+			$sendfrom = $btc->sendfrom(
+				$label,
+				$address,
+				$amount,
+				1,
+				$label,
+				'btc-tip-jar'
+			);
+
+			$transaction = $sendfrom['result'];
+
+			return 'WITHDRAWN';
+
+		} catch( Exception $e ) {
+			error_log( $e->getMessage() );
+			return 'CONNECTION';
 		}
 	}
 }

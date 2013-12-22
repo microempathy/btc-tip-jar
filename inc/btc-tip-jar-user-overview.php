@@ -129,7 +129,11 @@ class Btc_Tip_Jar_User_History_Table extends WP_List_Table {
 				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
 			case 'balance':
 				$class = 'btc-tip-jar_fx-format btc-tip-jar_history-table-balance';
-				return "<span class=\"{$class}\">{$item[$column_name]}</span>";
+				return sprintf(
+					'<span class="%s">%f</span>',
+					$class,
+					$item[$column_name]
+				);
 			default:
 				return $item[$column_name];
 		}
